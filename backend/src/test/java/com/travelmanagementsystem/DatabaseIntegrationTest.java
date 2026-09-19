@@ -7,34 +7,11 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Testcontainers
+import com.travelmanagementsystem.shared.IntegrationTest;
+
 @DisplayName("Database Integration Tests")
-class DatabaseIntegrationTest {
-
-	@Container
-	static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:18")
-		.withDatabaseName("travelmanagementsystem_test")
-		.withUsername("test")
-		.withPassword("test");
-
-	@DynamicPropertySource
-	static void configureProperties(DynamicPropertyRegistry registry) {
-		registry.add("spring.datasource.url", postgres::getJdbcUrl);
-		registry.add("spring.datasource.username", postgres::getUsername);
-		registry.add("spring.datasource.password", postgres::getPassword);
-		registry.add("spring.flyway.enabled", () -> "true");
-		registry.add("spring.jpa.hibernate.ddl-auto", () -> "validate");
-	}
+class DatabaseIntegrationTest extends IntegrationTest {
 
 	@Autowired
 	private DataSource dataSource;

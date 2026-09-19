@@ -98,6 +98,8 @@ class ArchitectureTest {
 				"javax..",
 				"jakarta..",
 				"org.springframework..",
+				"org.testcontainers..",
+				"org.junit..",
 				"org.slf4j..")
 			.as("Shared package must not depend on any module");
 
