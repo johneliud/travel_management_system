@@ -35,6 +35,17 @@ curl http://localhost:8080/actuator/health
 # Expected: {"status":"UP"}
 ```
 
+### API Documentation
+
+Once running, the OpenAPI spec and Swagger UI are available at:
+
+| URL | Description |
+|-----|-------------|
+| http://localhost:8080/swagger-ui.html | Swagger UI (interactive docs) |
+| http://localhost:8080/v3/api-docs | OpenAPI 3.1 spec (JSON) |
+
+The spec auto-generates from controllers and DTOs as they're added.
+
 ## Testing
 
 ### Running All Tests
