@@ -38,6 +38,7 @@ class ArchitectureTest {
 	static final ArchRule domain_layer_must_not_depend_on_infrastructure =
 		classes()
 			.that().resideInAPackage(BASE_PACKAGE + "..domain..")
+			.and().resideOutsideOfPackage(BASE_PACKAGE + ".shared..")
 			.should().onlyDependOnClassesThat()
 			.resideInAnyPackage(
 				BASE_PACKAGE + "..domain..",
@@ -56,6 +57,7 @@ class ArchitectureTest {
 	static final ArchRule application_layer_must_not_depend_on_infrastructure =
 		classes()
 			.that().resideInAPackage(BASE_PACKAGE + "..application..")
+			.and().resideOutsideOfPackage(BASE_PACKAGE + ".shared..")
 			.should().onlyDependOnClassesThat()
 			.resideInAnyPackage(
 				BASE_PACKAGE + "..api..",
@@ -70,9 +72,10 @@ class ArchitectureTest {
 			.as("Application layer must not depend on infrastructure layer");
 
 	@ArchTest
-	static final ArchRule api_layer_must_not_depend_on_domain_or_infrastructure =
+	static final ArchRule module_api_layers_must_not_depend_on_domain_or_infrastructure =
 		classes()
-			.that().resideInAPackage(BASE_PACKAGE + "..api..")
+			.that().resideInAnyPackage(modulePackages("..api.."))
+			.and().resideOutsideOfPackage(BASE_PACKAGE + ".shared..")
 			.should().onlyDependOnClassesThat()
 			.resideInAnyPackage(
 				BASE_PACKAGE + "..api..",
@@ -81,12 +84,13 @@ class ArchitectureTest {
 				"javax..",
 				"jakarta..",
 				"org.springframework..")
-			.as("API layer must not depend on domain or infrastructure layers");
+			.as("Module API layer must not depend on domain or infrastructure layers");
 
 	@ArchTest
 	static final ArchRule shared_must_not_depend_on_any_module =
 		classes()
 			.that().resideInAPackage(BASE_PACKAGE + ".shared..")
+			.and().resideOutsideOfPackage(BASE_PACKAGE + ".shared.api..")
 			.should().onlyDependOnClassesThat()
 			.resideInAnyPackage(
 				BASE_PACKAGE + ".shared..",
@@ -96,4 +100,23 @@ class ArchitectureTest {
 				"org.springframework..",
 				"org.slf4j..")
 			.as("Shared package must not depend on any module");
+
+	@ArchTest
+	static final ArchRule shared_api_may_depend_on_shared_exceptions =
+		classes()
+			.that().resideInAPackage(BASE_PACKAGE + ".shared.api..")
+			.should().onlyDependOnClassesThat()
+			.resideInAnyPackage(
+				BASE_PACKAGE + ".shared..",
+				"java..",
+				"javax..",
+				"jakarta..",
+				"org.springframework..",
+				"org.slf4j..",
+				"com.fasterxml..",
+				"tools.jackson..",
+				"org.junit..",
+				"org.mockito..",
+				"org.assertj..")
+			.as("Shared API may depend on shared exceptions and Jackson");
 }
