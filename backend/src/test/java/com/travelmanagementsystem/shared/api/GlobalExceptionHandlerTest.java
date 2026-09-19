@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -22,6 +23,7 @@ import com.travelmanagementsystem.shared.exception.NotFoundException;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+@ActiveProfiles("test")
 @DisplayName("Global Exception Handler Tests")
 class GlobalExceptionHandlerTest {
 
