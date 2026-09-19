@@ -1,59 +1,78 @@
 # Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.3.
+Angular 22 application with SSR, Tailwind CSS v4, and Vitest.
 
-## Development server
+## Prerequisites
 
-To start a local development server, run:
+- Node.js 20+
+- npm 11+
 
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Local Development
 
 ```bash
-ng generate component component-name
+npm install
+npm start
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+The app runs at `http://localhost:4200/`.
+
+### Environment Configuration
+
+The API base URL is configured via the `API_BASE_URL` environment variable:
 
 ```bash
-ng generate --help
+API_BASE_URL=http://localhost:8080 npm start
 ```
 
-## Building
+If not set, it defaults to `http://localhost:8080`. The environment file is auto-generated at build time by `scripts/setup-environment.ts`.
 
-To build the project run:
+## Scripts
 
-```bash
-ng build
+| Command | Description |
+|---------|-------------|
+| `npm start` | Start dev server |
+| `npm run build` | Production build |
+| `npm test` | Run unit tests (Vitest) |
+| `npm run lint` | Lint TypeScript files |
+| `npm run lint:fix` | Lint and auto-fix |
+| `npm run format` | Format with Prettier |
+| `npm run format:check` | Check formatting |
+
+## Folder Structure
+
+```
+src/app/
+├── core/                    # Singleton services, guards, interceptors
+│   ├── auth/                # Auth-related types and utilities
+│   ├── guards/              # Route guards (authGuard, etc.)
+│   ├── interceptors/        # HTTP interceptors (apiPrefix, auth)
+│   └── services/            # Environment config, API base service
+├── shared/                  # Reusable components, directives, pipes
+│   ├── components/
+│   ├── directives/
+│   └── pipes/
+├── features/                # Feature modules (lazy-loaded)
+│   ├── auth/                # Phase 2: Login, register
+│   ├── travel/              # Phase 3: Trips, bookings
+│   └── ...                  # Future features
+├── app.ts                   # Root component
+├── app.html                 # Root template (shell layout)
+├── app.config.ts            # Client-side providers
+├── app.routes.ts            # Route definitions
+└── app.spec.ts              # Root component tests
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### Conventions
 
-## Running unit tests
+- **`core/`** — Singleton services, guards, and interceptors. Never imported by other core modules.
+- **`shared/`** — Reusable UI primitives. Can be imported by any feature module.
+- **`features/`** — One directory per feature. Each has its own routes, components, and services. Lazy-loaded via `app.routes.ts`.
+- **Environment access** — Use `inject(ENVIRONMENT)` to get the `apiBaseUrl` and other config.
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Tech Stack
 
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- Angular 22 (standalone components, signals, native control flow)
+- Tailwind CSS v4
+- Vitest (unit testing)
+- ESLint + Prettier
+- SSR via Express + `@angular/ssr`
