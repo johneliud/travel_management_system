@@ -46,3 +46,6 @@ Thumbs.db
 # Config files
 .codex/
 .gemini/
+
+# Secrets
+**/environment
