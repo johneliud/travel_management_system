@@ -1,0 +1,2 @@
+-- Baseline migration for Flyway tracking.
+-- This migration establishes the Flyway schema_history table only. Business tables are created by their owning modules.
