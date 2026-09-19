@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" fill="#c46a4a"/>
+  <text
+    x="50%"
+    y="50%"
+    dominant-baseline="middle"
+    text-anchor="middle"
+    font-size="18"
+    font-family="DM Sans, sans-serif"
+    fill="#fdf3ef"
+    font-weight="bold"
+  >
+    TMS
+  </text>
+</svg>
