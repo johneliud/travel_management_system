@@ -1,0 +1,130 @@
+# Module Architecture
+
+## Overview
+
+The backend follows a **package-by-module** structure where each business domain is isolated into its own module. Modules communicate only through public API contracts, never through internal implementation details.
+
+## Module List
+
+| Module           | Responsibility                                      |
+|------------------|-----------------------------------------------------|
+| `identity`       | User authentication, authorization, profiles        |
+| `travel`         | Trip/itinerary management, bookings                 |
+| `subscription`   | Subscription plans, billing cycles                  |
+| `payment`        | Payment processing, refunds, transaction history    |
+| `feedback`       | Reviews, ratings, surveys                           |
+| `reporting`      | Analytics dashboards, exported reports              |
+| `search`         | Full-text search, filtering, indexing               |
+| `recommendation` | Travel suggestions, personalization                 |
+| `ai`             | AI-powered features, LLM integration                |
+| `analytics`      | Event tracking, metrics aggregation                 |
+| `notification`   | Email, push, in-app notifications                   |
+| `shared`         | Cross-cutting: base exceptions, common value objects|
+
+## Four-Layer Convention
+
+Every module (except `shared`) follows the same internal structure:
+
+```
+<module>/
+  api/            # Public contracts: DTOs, request/response objects, facade interfaces
+  application/    # Use-case orchestration: service interfaces, command/query handlers
+  domain/         # Core business logic: entities, value objects, domain events, repository interfaces
+  infrastructure/ # Implementation details: repository impls, external clients, config, mappers
+```
+
+### Layer Rules
+
+| Layer            | Contains                                         | Visibility      |
+|------------------|--------------------------------------------------|-----------------|
+| `api/`           | DTOs, facade interfaces, request/response models | **Public**      |
+| `application/`   | Use-case handlers, service interfaces            | **Public**      |
+| `domain/`        | Entities, value objects, repository interfaces    | Package-private |
+| `infrastructure/`| Repository impls, mappers, external adapters      | Package-private |
+
+### What Belongs Where
+
+- **api/**: Anything the outside world (other modules, controllers, tests) needs to see. DTOs, command objects, facade interfaces.
+- **application/**: Orchestration logic. Calls domain services, coordinates transactions. No business rules here.
+- **domain/**: Pure business logic. Entities, value objects, domain events, repository interfaces (not implementations). Should have no framework dependencies.
+- **infrastructure/**: Technical implementations. JPA repositories, HTTP clients, email senders, message brokers. Implements interfaces defined in domain/.
+
+## Boundary Rules
+
+### Rule 1: No Reaching Into Another Module's Internals
+
+A module may **never** directly import from another module's `domain/` or `infrastructure/` packages.
+
+**Allowed:**
+```
+identity.application → travel.api (facade interface)
+identity.application → shared.exception (base exception)
+```
+
+**Forbidden:**
+```
+identity.application → travel.infrastructure (internal implementation)
+identity.domain → travel.domain (direct entity access)
+```
+
+### Rule 2: Cross-Module Communication
+
+Modules communicate through:
+1. **API interfaces** defined in `<module>/api/` or `<module>/application/`
+2. **Domain events** (Phase 7+)
+3. **Shared kernel** (`shared/`) for truly cross-cutting concerns
+
+### Rule 3: Domain Layer Isolation
+
+The `domain/` layer must not depend on:
+- Any module's `infrastructure/` layer
+- Any module's `application/` layer (except its own)
+- Framework-specific annotations (except basic Jakarta/Javax)
+
+### Rule 4: Shared Package Restrictions
+
+The `shared/` package must not depend on any module. It is a leaf dependency.
+
+## Enforcement
+
+These rules are **automatically enforced** via ArchUnit tests in `ArchitectureTest.java`. The tests run as part of `mvn test` and will fail the build if any boundary violation is detected.
+
+To run the architecture tests:
+```bash
+./mvnw test -Dtest=ArchitectureTest
+```
+
+## Adding a New Module
+
+1. Create the four-layer package structure:
+   ```
+   src/main/java/com/travelmanagementsystem/<module>/
+     api/
+     application/
+     domain/
+     infrastructure/
+   ```
+
+2. Add `package-info.java` to each package.
+
+3. The ArchUnit tests will automatically enforce boundaries for the new module.
+
+## Package Structure
+
+```
+com.travelmanagementsystem
+  ├── identity/
+  │   ├── api/
+  │   ├── application/
+  │   ├── domain/
+  │   └── infrastructure/
+  ├── travel/
+  │   ├── api/
+  │   ├── application/
+  │   ├── domain/
+  │   └── infrastructure/
+  ├── ... (other modules)
+  └── shared/
+      ├── exception/    # DomainException, NotFoundException, BusinessException
+      └── valueobject/  # Common value objects
+```
