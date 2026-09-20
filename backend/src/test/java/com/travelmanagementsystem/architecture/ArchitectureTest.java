@@ -68,6 +68,8 @@ class ArchitectureTest {
 				"javax..",
 				"jakarta..",
 				"org.springframework..",
+				"org.junit..",
+				"org.assertj..",
 				"org.slf4j..")
 			.as("Application layer must not depend on infrastructure layer");
 
