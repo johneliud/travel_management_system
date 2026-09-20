@@ -1,0 +1,41 @@
+package com.travelmanagementsystem.identity.api;
+
+import com.travelmanagementsystem.identity.application.RegistrationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping(value = "/api/auth", headers = "X-API-Version=1")
+@Tag(name = "Authentication", description = "Registration and login endpoints")
+public class AuthController {
+
+    private final RegistrationService registrationService;
+
+    public AuthController(RegistrationService registrationService) {
+        this.registrationService = registrationService;
+    }
+
+    @PostMapping("/register")
+    @Operation(
+        summary = "Register a new account",
+        description = "Creates a new TRAVELER account. Requires header X-API-Version: 1. Returns 409 if the email is already registered.",
+        responses = {
+            @ApiResponse(responseCode = "201", description = "Account created successfully"),
+            @ApiResponse(responseCode = "400", description = "Validation error", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Email already in use", content = @Content)
+        }
+    )
+    public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
+        RegisterResponse response = registrationService.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+}
