@@ -61,3 +61,38 @@ See `.env.example` for placeholder values.
 ## Testing
 
 Integration tests use Testcontainers to spin up a fresh PostgreSQL instance. Tests are independent of the shared development database.
+
+## Identity Module Tables
+
+Owned by the `identity` module (migration `V2__identity_schema.sql`).
+
+### users
+
+| Column | Type | Nullable | Default | Notes |
+|--------|------|----------|---------|-------|
+| id | BIGSERIAL | no | auto | Primary key |
+| email | VARCHAR(255) | no | — | Unique, indexed |
+| password_hash | VARCHAR(255) | no | — | Never exposed outside identity |
+| status | VARCHAR(20) | no | 'ACTIVE' | CHECK: ACTIVE, INACTIVE, LOCKED |
+| email_verified | BOOLEAN | no | false | |
+| created_at | TIMESTAMPTZ | no | NOW() | |
+| updated_at | TIMESTAMPTZ | no | NOW() | |
+
+### roles
+
+| Column | Type | Nullable | Default | Notes |
+|--------|------|----------|---------|-------|
+| id | BIGSERIAL | no | auto | Primary key |
+| name | VARCHAR(50) | no | — | Unique (ADMIN, TRAVEL_MANAGER, TRAVELER) |
+| description | VARCHAR(255) | yes | — | |
+| created_at | TIMESTAMPTZ | no | NOW() | |
+
+### user_roles (join table)
+
+| Column | Type | Nullable | Notes |
+|--------|------|----------|-------|
+| user_id | BIGINT | no | FK → users.id (CASCADE delete) |
+| role_id | BIGINT | no | FK → roles.id (CASCADE delete) |
+| assigned_at | TIMESTAMPTZ | no | Default NOW() |
+
+Composite primary key: `(user_id, role_id)`
