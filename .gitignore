@@ -35,3 +35,6 @@ build/
 ### Secrets ###
 **.properties
 !**application.properties
+
+# Added by ggshield
+.cache_ggshield
