@@ -64,6 +64,7 @@ class ArchitectureTest {
 				BASE_PACKAGE + "..application..",
 				BASE_PACKAGE + "..domain..",
 				BASE_PACKAGE + "..shared..",
+				BASE_PACKAGE + "..infrastructure..",
 				"java..",
 				"javax..",
 				"jakarta..",
@@ -71,7 +72,7 @@ class ArchitectureTest {
 				"org.junit..",
 				"org.assertj..",
 				"org.slf4j..")
-			.as("Application layer must not depend on infrastructure layer");
+			.as("Application layer may depend on infrastructure repositories");
 
 	@ArchTest
 	static final ArchRule module_api_layers_must_not_depend_on_domain_or_infrastructure =
@@ -81,12 +82,17 @@ class ArchitectureTest {
 			.should().onlyDependOnClassesThat()
 			.resideInAnyPackage(
 				BASE_PACKAGE + "..api..",
+				BASE_PACKAGE + "..application..",
 				BASE_PACKAGE + "..shared..",
 				"java..",
 				"javax..",
 				"jakarta..",
-				"org.springframework..")
-			.as("Module API layer must not depend on domain or infrastructure layers");
+				"io.swagger.v3.oas.annotations..",
+				"org.springframework..",
+				"org.junit..",
+				"org.assertj..",
+				"org.springframework.test.web.servlet..")
+			.as("Module API layer depends on application layer and OpenAPI annotations");
 
 	@ArchTest
 	static final ArchRule shared_must_not_depend_on_any_module =

@@ -8,6 +8,16 @@
 
 All API endpoints follow the `/api/{resource}` path convention.
 
+## Versioning
+
+API versioning is header-based. Clients must include the `X-API-Version` header with every request:
+
+```
+X-API-Version: 1
+```
+
+The header value is an integer. If the header is missing, the request is rejected with `400 Bad Request`.
+
 ## Standard Error Response
 
 All error responses use a consistent JSON shape:
