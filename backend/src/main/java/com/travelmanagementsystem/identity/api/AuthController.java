@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "/api/auth", headers = "X-API-Version=1")
-@Tag(name = "Authentication", description = "Registration and login endpoints")
+@Tag(name = "Authentication", description = "Registration, login, token refresh, and logout endpoints")
 public class AuthController {
 
     private final RegistrationService registrationService;
@@ -56,5 +56,34 @@ public class AuthController {
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         LoginResponse response = authService.login(request);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/refresh")
+    @Operation(
+        summary = "Exchange a refresh token for a new token pair",
+        description = "Rotates the refresh token: the old refresh token is revoked and a new access/refresh token pair is issued. Requires header X-API-Version: 1.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Token refresh successful"),
+            @ApiResponse(responseCode = "400", description = "Validation error", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Invalid, expired, or revoked refresh token", content = @Content)
+        }
+    )
+    public ResponseEntity<LoginResponse> refresh(@Valid @RequestBody RefreshRequest request) {
+        LoginResponse response = authService.refresh(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/logout")
+    @Operation(
+        summary = "Revoke a refresh token",
+        description = "Revokes the presented refresh token so it can no longer be used. Requires header X-API-Version: 1.",
+        responses = {
+            @ApiResponse(responseCode = "204", description = "Logout successful"),
+            @ApiResponse(responseCode = "400", description = "Validation error", content = @Content)
+        }
+    )
+    public ResponseEntity<Void> logout(@Valid @RequestBody LogoutRequest request) {
+        authService.logout(request);
+        return ResponseEntity.noContent().build();
     }
 }
