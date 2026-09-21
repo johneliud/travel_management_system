@@ -17,8 +17,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
+import com.travelmanagementsystem.shared.exception.AccountDisabledException;
 import com.travelmanagementsystem.shared.exception.BusinessException;
 import com.travelmanagementsystem.shared.exception.ConflictException;
+import com.travelmanagementsystem.shared.exception.InvalidCredentialsException;
 import com.travelmanagementsystem.shared.exception.NotFoundException;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -63,6 +65,32 @@ class GlobalExceptionHandlerTest {
 		assertThat(response.getBody()).isNotNull();
 		assertThat(response.getBody().code()).isEqualTo("EMAIL_EXISTS");
 		assertThat(response.getBody().message()).isEqualTo("Email already registered");
+	}
+
+	@Test
+	@DisplayName("Should return 401 for InvalidCredentialsException")
+	void shouldReturn401ForInvalidCredentials() {
+		InvalidCredentialsException ex = InvalidCredentialsException.of();
+
+		ResponseEntity<ErrorResponse> response = handler.handleAuthentication(ex, request);
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+		assertThat(response.getBody()).isNotNull();
+		assertThat(response.getBody().code()).isEqualTo("INVALID_CREDENTIALS");
+		assertThat(response.getBody().message()).isEqualTo("Invalid email or password");
+	}
+
+	@Test
+	@DisplayName("Should return 403 for AccountDisabledException")
+	void shouldReturn403ForAccountDisabled() {
+		AccountDisabledException ex = AccountDisabledException.of("INACTIVE");
+
+		ResponseEntity<ErrorResponse> response = handler.handleAccountDisabled(ex, request);
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+		assertThat(response.getBody()).isNotNull();
+		assertThat(response.getBody().code()).isEqualTo("ACCOUNT_DISABLED");
+		assertThat(response.getBody().message()).isEqualTo("Account is inactive");
 	}
 
 	@Test
