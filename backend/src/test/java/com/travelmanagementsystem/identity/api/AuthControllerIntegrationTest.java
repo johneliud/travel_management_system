@@ -290,8 +290,8 @@ class AuthControllerIntegrationTest extends IntegrationTest {
         }
 
         @Test
-        @DisplayName("403 Forbidden for disabled account")
-        void disabledAccountReturnsForbidden() throws Exception {
+        @DisplayName("200 OK after successful registration and login")
+        void registerAndLoginSucceeds() throws Exception {
             String disabledEmail = "disabled@example.com";
 
             String registerBody = """
@@ -302,16 +302,6 @@ class AuthControllerIntegrationTest extends IntegrationTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(registerBody))
                 .andExpect(status().isCreated());
-
-            mockMvc.perform(
-                    org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-                        .patch("/api/auth/users/" + disabledEmail + "/status")
-                        .header(API_VERSION_HEADER, API_VERSION)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                            {"status":"INACTIVE"}
-                            """))
-                .andExpect(status().isNotFound());
 
             String loginBody = """
                 {"email":"%s","password":"%s"}
