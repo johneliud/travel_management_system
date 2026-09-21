@@ -1,6 +1,7 @@
 package com.travelmanagementsystem.identity.infrastructure.security;
 
 import com.travelmanagementsystem.identity.application.JwtService;
+import com.travelmanagementsystem.shared.security.JwtPrincipal;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;

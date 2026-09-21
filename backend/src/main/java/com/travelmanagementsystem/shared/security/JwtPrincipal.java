@@ -1,4 +1,4 @@
-package com.travelmanagementsystem.identity.infrastructure.security;
+package com.travelmanagementsystem.shared.security;
 
 import java.util.Objects;
 
@@ -21,11 +21,11 @@ public class JwtPrincipal {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
         
-        if (o == null || getClass() != o.getClass()) return false;
-        JwtPrincipal that = (JwtPrincipal) o;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        JwtPrincipal that = (JwtPrincipal) obj;
         return Objects.equals(userId, that.userId) && Objects.equals(email, that.email);
     }
 

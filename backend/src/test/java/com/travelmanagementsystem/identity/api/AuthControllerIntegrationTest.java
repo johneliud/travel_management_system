@@ -4,9 +4,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.security.SecureRandom;
-
 import com.travelmanagementsystem.shared.IntegrationTest;
+import com.travelmanagementsystem.shared.TestData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -24,29 +23,8 @@ class AuthControllerIntegrationTest extends IntegrationTest {
     private static final String API_VERSION_HEADER = "X-API-Version";
     private static final String API_VERSION = "1";
 
-    private static final String UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    private static final String LOWER = "abcdefghijklmnopqrstuvwxyz";
-    private static final String DIGITS = "0123456789";
-    private static final String SPECIAL = "@$!%*?&#";
-    private static final String ALL_CHARS = UPPER + LOWER + DIGITS + SPECIAL;
-
-    private static String generateValidPassword() {
-        SecureRandom random = new SecureRandom();
-        StringBuilder sb = new StringBuilder(16);
-        
-        sb.append(UPPER.charAt(random.nextInt(UPPER.length())));
-        sb.append(LOWER.charAt(random.nextInt(LOWER.length())));
-        sb.append(DIGITS.charAt(random.nextInt(DIGITS.length())));
-        sb.append(SPECIAL.charAt(random.nextInt(SPECIAL.length())));
-        
-        for (int i = 4; i < 16; i++) {
-            sb.append(ALL_CHARS.charAt(random.nextInt(ALL_CHARS.length())));
-        }
-        return sb.toString();
-    }
-
-    private static final String REGISTER_PASSWORD = generateValidPassword();
-    private static final String WRONG_PASSWORD = generateValidPassword();
+    private static final String REGISTER_PASSWORD = TestData.generateValidPassword();
+    private static final String WRONG_PASSWORD = TestData.generateValidPassword();
 
     @Autowired
     private MockMvc mockMvc;
@@ -76,7 +54,7 @@ class AuthControllerIntegrationTest extends IntegrationTest {
         void registerSuccess() throws Exception {
             String body = """
                 {"email":"newuser@example.com","password":"%s"}
-                """.formatted(generateValidPassword());
+                """.formatted(TestData.generateValidPassword());
 
             mockMvc.perform(post("/api/auth/register")
                     .header(API_VERSION_HEADER, API_VERSION)
@@ -95,7 +73,7 @@ class AuthControllerIntegrationTest extends IntegrationTest {
         void duplicateEmailReturnsConflict() throws Exception {
             String body = """
                 {"email":"existing@example.com","password":"%s"}
-                """.formatted(generateValidPassword());
+                """.formatted(TestData.generateValidPassword());
 
             mockMvc.perform(post("/api/auth/register")
                     .header(API_VERSION_HEADER, API_VERSION)
@@ -127,7 +105,7 @@ class AuthControllerIntegrationTest extends IntegrationTest {
         void invalidEmailReturnsBadRequest() throws Exception {
             String body = """
                 {"email":"not-an-email","password":"%s"}
-                """.formatted(generateValidPassword());
+                """.formatted(TestData.generateValidPassword());
 
             mockMvc.perform(post("/api/auth/register")
                     .header(API_VERSION_HEADER, API_VERSION)
@@ -172,7 +150,7 @@ class AuthControllerIntegrationTest extends IntegrationTest {
         void passwordHashNotExposed() throws Exception {
             String body = """
                 {"email":"secure@example.com","password":"%s"}
-                """.formatted(generateValidPassword());
+                """.formatted(TestData.generateValidPassword());
 
             MvcResult result = mockMvc.perform(post("/api/auth/register")
                     .header(API_VERSION_HEADER, API_VERSION)
@@ -247,8 +225,8 @@ class AuthControllerIntegrationTest extends IntegrationTest {
         @DisplayName("401 Unauthorized with unknown email")
         void unknownEmailReturnsUnauthorized() throws Exception {
             String body = """
-                {"email":"unknown@example.com","password":"AnyPass!123"}
-                """;
+                {"email":"unknown@example.com","password":"%s"}
+                """.formatted(TestData.generateValidPassword());
 
             mockMvc.perform(post("/api/auth/login")
                     .header(API_VERSION_HEADER, API_VERSION)
@@ -266,8 +244,8 @@ class AuthControllerIntegrationTest extends IntegrationTest {
                 {"email":"%s","password":"%s"}
                 """.formatted(LOGIN_EMAIL, WRONG_PASSWORD);
             String unknownEmailBody = """
-                {"email":"nonexistent@example.com","password":"AnyPass!123"}
-                """;
+                {"email":"nonexistent@example.com","password":"%s"}
+                """.formatted(TestData.generateValidPassword());
 
             MvcResult wrongPasswordResult = mockMvc.perform(post("/api/auth/login")
                     .header(API_VERSION_HEADER, API_VERSION)
