@@ -7,6 +7,7 @@ import com.travelmanagementsystem.identity.domain.User;
 import com.travelmanagementsystem.identity.infrastructure.persistence.RoleRepository;
 import com.travelmanagementsystem.identity.infrastructure.persistence.UserRepository;
 import com.travelmanagementsystem.shared.exception.ConflictException;
+import com.travelmanagementsystem.shared.security.Roles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class RegistrationService {
 
     private static final Logger log = LoggerFactory.getLogger(RegistrationService.class);
-    private static final String TRAVELER_ROLE = "TRAVELER";
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -39,7 +39,7 @@ public class RegistrationService {
 
         User user = new User(request.email(), hashedPassword);
 
-        Role travelerRole = roleRepository.findByName(TRAVELER_ROLE)
+        Role travelerRole = roleRepository.findByName(Roles.TRAVELER)
             .orElseThrow(() -> new IllegalStateException("TRAVELER role not found"));
         user.addRole(travelerRole);
 
