@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import com.travelmanagementsystem.shared.exception.AccountDisabledException;
+import com.travelmanagementsystem.shared.exception.AuthenticationException;
 import com.travelmanagementsystem.shared.exception.BusinessException;
 import com.travelmanagementsystem.shared.exception.ConflictException;
 import com.travelmanagementsystem.shared.exception.NotFoundException;
@@ -32,6 +34,20 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ErrorResponse> handleConflict(ConflictException ex, jakarta.servlet.http.HttpServletRequest request) {
 		log.warn("Conflict: {} - {}", ex.getErrorCode(), ex.getMessage());
 		return ResponseEntity.status(HttpStatus.CONFLICT)
+			.body(ErrorResponse.of(ex.getErrorCode(), ex.getMessage(), request.getRequestURI()));
+	}
+
+	@ExceptionHandler(AuthenticationException.class)
+	public ResponseEntity<ErrorResponse> handleAuthentication(AuthenticationException ex, jakarta.servlet.http.HttpServletRequest request) {
+		log.warn("Authentication error: {} - {}", ex.getErrorCode(), ex.getMessage());
+		return ResponseEntity.status(ex.getHttpStatus())
+			.body(ErrorResponse.of(ex.getErrorCode(), ex.getMessage(), request.getRequestURI()));
+	}
+
+	@ExceptionHandler(AccountDisabledException.class)
+	public ResponseEntity<ErrorResponse> handleAccountDisabled(AccountDisabledException ex, jakarta.servlet.http.HttpServletRequest request) {
+		log.warn("Account disabled: {} - {}", ex.getErrorCode(), ex.getMessage());
+		return ResponseEntity.status(ex.getHttpStatus())
 			.body(ErrorResponse.of(ex.getErrorCode(), ex.getMessage(), request.getRequestURI()));
 	}
 
