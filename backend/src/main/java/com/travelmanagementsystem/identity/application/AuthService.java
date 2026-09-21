@@ -2,12 +2,15 @@ package com.travelmanagementsystem.identity.application;
 
 import com.travelmanagementsystem.identity.api.LoginRequest;
 import com.travelmanagementsystem.identity.api.LoginResponse;
+import com.travelmanagementsystem.identity.api.LogoutRequest;
+import com.travelmanagementsystem.identity.api.RefreshRequest;
 import com.travelmanagementsystem.identity.domain.RefreshToken;
 import com.travelmanagementsystem.identity.domain.User;
 import com.travelmanagementsystem.identity.infrastructure.persistence.RefreshTokenRepository;
 import com.travelmanagementsystem.identity.infrastructure.persistence.UserRepository;
 import com.travelmanagementsystem.shared.exception.AccountDisabledException;
 import com.travelmanagementsystem.shared.exception.InvalidCredentialsException;
+import com.travelmanagementsystem.shared.exception.InvalidRefreshTokenException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -56,6 +59,57 @@ public class AuthService {
             throw AccountDisabledException.of(user.getStatus());
         }
 
+        return issueTokenPair(user);
+    }
+
+    @Transactional
+    public LoginResponse refresh(RefreshRequest request) {
+        String tokenHash = hashRefreshToken(request.refreshToken());
+
+        RefreshToken refreshToken = refreshTokenRepository.findByTokenHash(tokenHash)
+                .orElseThrow(() -> InvalidRefreshTokenException.notFound());
+
+        if (refreshToken.isExpired()) {
+            log.debug("Refresh token {} expired", refreshToken.getId());
+            throw InvalidRefreshTokenException.expired();
+        }
+
+        if (refreshToken.isRevoked()) {
+            log.debug("Refresh token {} revoked", refreshToken.getId());
+            throw InvalidRefreshTokenException.revoked();
+        }
+
+        User user = refreshToken.getUser();
+
+        if (!"ACTIVE".equals(user.getStatus())) {
+            log.debug("Account inactive for user with id {}", user.getId());
+            throw AccountDisabledException.of(user.getStatus());
+        }
+
+        refreshToken.revoke();
+        refreshTokenRepository.save(refreshToken);
+
+        log.debug("Refresh token {} revoked, issuing new pair for user with id {}", refreshToken.getId(), user.getId());
+
+        return issueTokenPair(user);
+    }
+
+    @Transactional
+    public void logout(LogoutRequest request) {
+        String tokenHash = hashRefreshToken(request.refreshToken());
+
+        refreshTokenRepository.findByTokenHash(tokenHash)
+                .ifPresent(token -> {
+                    if (!token.isRevoked()) {
+                        token.revoke();
+                        refreshTokenRepository.save(token);
+
+                        log.debug("Refresh token {} revoked via logout", token.getId());
+                    }
+                });
+    }
+
+    private LoginResponse issueTokenPair(User user) {
         Map<String, Object> claims = Map.of(
                 "userId", user.getId(),
                 "email", user.getEmail(),
@@ -71,7 +125,7 @@ public class AuthService {
         RefreshToken persistedToken = new RefreshToken(user, refreshTokenHash, expiresAt);
         refreshTokenRepository.save(persistedToken);
 
-        log.debug("User with id {} logged in successfully", user.getId());
+        log.debug("Issued new token pair for user with id {}", user.getId());
 
         return new LoginResponse(
                 accessToken,
