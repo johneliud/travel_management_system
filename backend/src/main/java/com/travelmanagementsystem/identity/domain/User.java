@@ -107,4 +107,16 @@ public class User {
     public void addRole(Role role) {
         this.roles.add(role);
     }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setEmailVerified(Boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
 }
