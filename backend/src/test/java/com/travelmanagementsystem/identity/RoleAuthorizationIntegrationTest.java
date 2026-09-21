@@ -5,13 +5,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.security.SecureRandom;
-
 import com.travelmanagementsystem.identity.domain.Role;
 import com.travelmanagementsystem.identity.domain.User;
 import com.travelmanagementsystem.identity.infrastructure.persistence.RoleRepository;
 import com.travelmanagementsystem.identity.infrastructure.persistence.UserRepository;
 import com.travelmanagementsystem.shared.IntegrationTest;
+import com.travelmanagementsystem.shared.TestData;
 import com.travelmanagementsystem.shared.security.Roles;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,28 +29,7 @@ class RoleAuthorizationIntegrationTest extends IntegrationTest {
     private static final String API_VERSION_HEADER = "X-API-Version";
     private static final String API_VERSION = "1";
 
-    private static final String UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    private static final String LOWER = "abcdefghijklmnopqrstuvwxyz";
-    private static final String DIGITS = "0123456789";
-    private static final String SPECIAL = "@$!%*?&#";
-    private static final String ALL_CHARS = UPPER + LOWER + DIGITS + SPECIAL;
-
-    private static String generateValidPassword() {
-        SecureRandom random = new SecureRandom();
-        StringBuilder sb = new StringBuilder(16);
-        
-        sb.append(UPPER.charAt(random.nextInt(UPPER.length())));
-        sb.append(LOWER.charAt(random.nextInt(LOWER.length())));
-        sb.append(DIGITS.charAt(random.nextInt(DIGITS.length())));
-        sb.append(SPECIAL.charAt(random.nextInt(SPECIAL.length())));
-        
-        for (int i = 4; i < 16; i++) {
-            sb.append(ALL_CHARS.charAt(random.nextInt(ALL_CHARS.length())));
-        }
-        return sb.toString();
-    }
-
-    private static final String TEST_PASSWORD = generateValidPassword();
+    private static final String TEST_PASSWORD = TestData.generateValidPassword();
 
     @Autowired
     private MockMvc mockMvc;
