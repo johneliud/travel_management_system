@@ -7,6 +7,7 @@ import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -32,7 +33,10 @@ public class JwtService {
     }
 
     public String generateRefreshToken(Map<String, Object> claims) {
-        return buildToken(claims, refreshTokenExpirationMs);
+        var claimsWithJti = new java.util.HashMap<>(claims);
+
+        claimsWithJti.put("jti", UUID.randomUUID().toString());
+        return buildToken(claimsWithJti, refreshTokenExpirationMs);
     }
 
     public Claims parseToken(String token) {
