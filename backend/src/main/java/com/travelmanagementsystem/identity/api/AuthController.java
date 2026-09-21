@@ -2,6 +2,8 @@ package com.travelmanagementsystem.identity.api;
 
 import com.travelmanagementsystem.identity.application.AuthService;
 import com.travelmanagementsystem.identity.application.RegistrationService;
+import com.travelmanagementsystem.identity.application.UserProfileService;
+import com.travelmanagementsystem.shared.security.JwtPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -9,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,15 +19,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "/api/auth", headers = "X-API-Version=1")
-@Tag(name = "Authentication", description = "Registration, login, token refresh, and logout endpoints")
+@Tag(name = "Authentication", description = "Registration, login, token refresh, logout, and password change endpoints")
 public class AuthController {
 
     private final RegistrationService registrationService;
     private final AuthService authService;
+    private final UserProfileService userProfileService;
 
-    public AuthController(RegistrationService registrationService, AuthService authService) {
+    public AuthController(
+            RegistrationService registrationService,
+            AuthService authService,
+            UserProfileService userProfileService) {
         this.registrationService = registrationService;
         this.authService = authService;
+        this.userProfileService = userProfileService;
     }
 
     @PostMapping("/register")
@@ -84,6 +92,23 @@ public class AuthController {
     )
     public ResponseEntity<Void> logout(@Valid @RequestBody LogoutRequest request) {
         authService.logout(request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/change-password")
+    @Operation(
+        summary = "Change own password",
+        description = "Changes the authenticated user's password after verifying the current password. Revokes all existing refresh tokens to force re-login on other sessions. Requires header X-API-Version: 1.",
+        responses = {
+            @ApiResponse(responseCode = "204", description = "Password changed successfully"),
+            @ApiResponse(responseCode = "400", description = "Validation error", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Current password is incorrect", content = @Content)
+        }
+    )
+    public ResponseEntity<Void> changePassword(
+            @AuthenticationPrincipal JwtPrincipal principal,
+            @Valid @RequestBody ChangePasswordRequest request) {
+        userProfileService.changePassword(principal.getUserId(), request);
         return ResponseEntity.noContent().build();
     }
 }
