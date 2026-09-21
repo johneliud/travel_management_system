@@ -1,5 +1,6 @@
 package com.travelmanagementsystem.identity.api;
 
+import com.travelmanagementsystem.identity.application.AuthService;
 import com.travelmanagementsystem.identity.application.RegistrationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -19,9 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final RegistrationService registrationService;
+    private final AuthService authService;
 
-    public AuthController(RegistrationService registrationService) {
+    public AuthController(RegistrationService registrationService, AuthService authService) {
         this.registrationService = registrationService;
+        this.authService = authService;
     }
 
     @PostMapping("/register")
@@ -37,5 +40,21 @@ public class AuthController {
     public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
         RegisterResponse response = registrationService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/login")
+    @Operation(
+        summary = "Authenticate and receive tokens",
+        description = "Validates credentials and returns an access/refresh token pair. Requires header X-API-Version: 1. Returns 401 for invalid credentials and 403 for disabled accounts.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Login successful"),
+            @ApiResponse(responseCode = "400", description = "Validation error", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Invalid credentials", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Account disabled", content = @Content)
+        }
+    )
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+        LoginResponse response = authService.login(request);
+        return ResponseEntity.ok(response);
     }
 }
