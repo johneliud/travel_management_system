@@ -69,6 +69,7 @@ class ArchitectureTest {
 				"javax..",
 				"jakarta..",
 				"org.springframework..",
+				"io.jsonwebtoken..",
 				"org.junit..",
 				"org.assertj..",
 				"org.slf4j..")
@@ -106,6 +107,7 @@ class ArchitectureTest {
 				"javax..",
 				"jakarta..",
 				"org.springframework..",
+				"io.swagger.v3.oas.models..",
 				"org.testcontainers..",
 				"org.junit..",
 				"org.slf4j..")
