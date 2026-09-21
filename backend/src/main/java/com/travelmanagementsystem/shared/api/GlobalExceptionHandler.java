@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -26,6 +27,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(NotFoundException.class)
 	public ResponseEntity<ErrorResponse> handleNotFound(NotFoundException ex, jakarta.servlet.http.HttpServletRequest request) {
 		log.warn("Not found: {} - {}", ex.getErrorCode(), ex.getMessage());
+
 		return ResponseEntity.status(HttpStatus.NOT_FOUND)
 			.body(ErrorResponse.of(ex.getErrorCode(), ex.getMessage(), request.getRequestURI()));
 	}
@@ -33,6 +35,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(ConflictException.class)
 	public ResponseEntity<ErrorResponse> handleConflict(ConflictException ex, jakarta.servlet.http.HttpServletRequest request) {
 		log.warn("Conflict: {} - {}", ex.getErrorCode(), ex.getMessage());
+
 		return ResponseEntity.status(HttpStatus.CONFLICT)
 			.body(ErrorResponse.of(ex.getErrorCode(), ex.getMessage(), request.getRequestURI()));
 	}
@@ -40,6 +43,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(AuthenticationException.class)
 	public ResponseEntity<ErrorResponse> handleAuthentication(AuthenticationException ex, jakarta.servlet.http.HttpServletRequest request) {
 		log.warn("Authentication error: {} - {}", ex.getErrorCode(), ex.getMessage());
+
 		return ResponseEntity.status(ex.getHttpStatus())
 			.body(ErrorResponse.of(ex.getErrorCode(), ex.getMessage(), request.getRequestURI()));
 	}
@@ -47,6 +51,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(AccountDisabledException.class)
 	public ResponseEntity<ErrorResponse> handleAccountDisabled(AccountDisabledException ex, jakarta.servlet.http.HttpServletRequest request) {
 		log.warn("Account disabled: {} - {}", ex.getErrorCode(), ex.getMessage());
+
 		return ResponseEntity.status(ex.getHttpStatus())
 			.body(ErrorResponse.of(ex.getErrorCode(), ex.getMessage(), request.getRequestURI()));
 	}
@@ -54,6 +59,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(BusinessException.class)
 	public ResponseEntity<ErrorResponse> handleBusiness(BusinessException ex, jakarta.servlet.http.HttpServletRequest request) {
 		log.warn("Business error: {} - {}", ex.getErrorCode(), ex.getMessage());
+
 		return ResponseEntity.badRequest()
 			.body(ErrorResponse.of(ex.getErrorCode(), ex.getMessage(), request.getRequestURI()));
 	}
@@ -69,6 +75,7 @@ public class GlobalExceptionHandler {
 			.collect(Collectors.joining(", "));
 
 		log.warn("Validation failed: {}", message);
+
 		return ResponseEntity.badRequest()
 			.body(ErrorResponse.of("VALIDATION_ERROR", message, request.getRequestURI(), fieldErrors));
 	}
@@ -76,13 +83,23 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(NoResourceFoundException.class)
 	public ResponseEntity<ErrorResponse> handleNoResource(NoResourceFoundException ex, jakarta.servlet.http.HttpServletRequest request) {
 		log.warn("Resource not found: {}", request.getRequestURI());
+
 		return ResponseEntity.status(HttpStatus.NOT_FOUND)
 			.body(ErrorResponse.of("RESOURCE_NOT_FOUND", "The requested resource was not found", request.getRequestURI()));
+	}
+
+	@ExceptionHandler(AccessDeniedException.class)
+	public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex, jakarta.servlet.http.HttpServletRequest request) {
+		log.warn("Access denied at {}: {}", request.getRequestURI(), ex.getMessage());
+
+		return ResponseEntity.status(HttpStatus.FORBIDDEN)
+			.body(ErrorResponse.of("ACCESS_DENIED", "Access denied", request.getRequestURI()));
 	}
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ErrorResponse> handleUnhandled(Exception ex, jakarta.servlet.http.HttpServletRequest request) {
 		log.error("Unhandled exception at {}: ", request.getRequestURI(), ex);
+
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 			.body(ErrorResponse.of("INTERNAL_ERROR", "An unexpected error occurred", request.getRequestURI()));
 	}
