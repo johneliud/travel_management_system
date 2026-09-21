@@ -125,6 +125,44 @@ com.travelmanagementsystem
   │   └── infrastructure/
   ├── ... (other modules)
   └── shared/
+      ├── api/          # GlobalExceptionHandler, ErrorResponse
+      ├── config/       # RateLimitFilter, CorsConfig
       ├── exception/    # DomainException, NotFoundException, BusinessException
+      ├── security/     # Roles constants (single source of truth for role names)
       └── valueobject/  # Common value objects
 ```
+
+## Role-Based Access Control
+
+### Roles Constants
+
+All role names are defined as constants in `shared.security.Roles`. Every module references roles by these constants — never by magic strings.
+
+```java
+public final class Roles {
+    public static final String ADMIN = "ADMIN";
+    public static final String TRAVEL_MANAGER = "TRAVEL_MANAGER";
+    public static final String TRAVELER = "TRAVELER";
+}
+```
+
+### Enforcing Role Requirements
+
+Method-level security is enabled via `@EnableMethodSecurity` on the security configuration. Endpoints enforce role requirements using `@PreAuthorize`:
+
+```java
+@GetMapping("/users")
+@PreAuthorize("hasRole('" + Roles.ADMIN + "')")
+public ResponseEntity<List<UserSummaryResponse>> listUsers() { ... }
+```
+
+### Role Hierarchy
+
+Roles are checked **explicitly per endpoint** — there is no implicit hierarchy. An `ADMIN` user must be explicitly granted access to admin-only endpoints; having a higher-level role does not implicitly satisfy lower-level checks. This avoids confusing edge cases as more roles are added.
+
+### Adding Role Checks to New Modules
+
+1. Import `com.travelmanagementsystem.shared.security.Roles`
+2. Annotate the service or controller method with `@PreAuthorize("hasRole('" + Roles.ROLE_NAME + "')")`
+3. The JWT filter already extracts roles from tokens and populates `SimpleGrantedAuthority("ROLE_<name>")` — no additional wiring needed
+4. Add an `@ExceptionHandler(AccessDeniedException.class)` in the module's exception handler (or rely on the shared `GlobalExceptionHandler`) to return 403
