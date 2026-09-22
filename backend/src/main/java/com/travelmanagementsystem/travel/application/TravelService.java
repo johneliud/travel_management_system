@@ -4,6 +4,7 @@ import com.travelmanagementsystem.shared.exception.BusinessException;
 import com.travelmanagementsystem.shared.exception.ConflictException;
 import com.travelmanagementsystem.shared.exception.NotFoundException;
 import com.travelmanagementsystem.shared.security.Roles;
+import com.travelmanagementsystem.travel.api.BrowseTravelsResponse;
 import com.travelmanagementsystem.travel.api.CreateTravelRequest;
 import com.travelmanagementsystem.travel.api.TravelResponse;
 import com.travelmanagementsystem.travel.api.UpdateTravelRequest;
@@ -12,9 +13,16 @@ import com.travelmanagementsystem.travel.domain.Transport;
 import com.travelmanagementsystem.travel.domain.Travel;
 import com.travelmanagementsystem.travel.domain.TravelStatus;
 import com.travelmanagementsystem.travel.infrastructure.persistence.TravelRepository;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,6 +67,80 @@ public class TravelService {
 
         Travel saved = travelRepository.save(travel);
         return toResponse(saved);
+    }
+
+    @Transactional(readOnly = true)
+    public BrowseTravelsResponse browse(
+            String country,
+            String city,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            LocalDate startDate,
+            LocalDate endDate,
+            String activity,
+            String sortBy,
+            String sortDirection,
+            int page,
+            int size) {
+
+        Specification<Travel> spec = (Specification<Travel>) (root, query, cb) -> null;
+
+        spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), TravelStatus.PUBLISHED));
+
+        if (country != null && !country.isBlank()) {
+            spec = spec.and((root, query, cb) -> cb.equal(cb.lower(root.get("destinationCountry")), country.toLowerCase()));
+        }
+
+        if (city != null && !city.isBlank()) {
+            spec = spec.and((root, query, cb) -> cb.equal(cb.lower(root.get("destinationCity")), city.toLowerCase()));
+        }
+
+        if (minPrice != null) {
+            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("price"), minPrice));
+        }
+
+        if (maxPrice != null) {
+            spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("price"), maxPrice));
+        }
+
+        if (startDate != null) {
+            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("startDate"), startDate));
+        }
+
+        if (endDate != null) {
+            spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("endDate"), endDate));
+        }
+
+        if (activity != null && !activity.isBlank()) {
+            spec = spec.and((root, query, cb) -> cb.like(cb.lower(root.join("activities").get("name")), "%" + activity.toLowerCase() + "%"));
+        }
+
+        Sort sort = resolveSort(sortBy, sortDirection);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Travel> result = travelRepository.findAll(spec, pageable);
+
+        List<TravelResponse> travels = result.getContent().stream()
+                .map(this::toResponse)
+                .toList();
+
+        return new BrowseTravelsResponse(
+                travels,
+                result.getNumber(),
+                result.getSize(),
+                result.getTotalElements(),
+                result.getTotalPages());
+    }
+
+    private Sort resolveSort(String sortBy, String sortDirection) {
+        Sort.Direction direction = "desc".equalsIgnoreCase(sortDirection) ? Sort.Direction.DESC : Sort.Direction.ASC;
+
+        return switch (sortBy != null ? sortBy.toLowerCase() : "created_at") {
+            case "price" -> Sort.by(direction, "price");
+            case "start_date" -> Sort.by(direction, "startDate");
+            case "created_at" -> Sort.by(direction, "createdAt");
+            default -> Sort.by(Sort.Direction.DESC, "createdAt");
+        };
     }
 
     @Transactional

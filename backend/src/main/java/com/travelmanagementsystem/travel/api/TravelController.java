@@ -9,27 +9,71 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "/api/travels", headers = "X-API-Version=1")
-@Tag(name = "Travel Management", description = "Endpoints for creating and managing travel offerings")
+@Tag(name = "Travel Management", description = "Endpoints for creating, managing, and browsing travel offerings")
 public class TravelController {
 
     private final TravelService travelService;
 
     public TravelController(TravelService travelService) {
         this.travelService = travelService;
+    }
+
+    @GetMapping
+    @Operation(
+        summary = "Browse published travel offerings",
+        description = "Returns a paginated list of PUBLISHED travels with optional filtering and sorting. Only published travels are visible. Requires header X-API-Version: 1.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Paginated list of travels"),
+            @ApiResponse(responseCode = "400", description = "Invalid filter parameters", content = @Content)
+        }
+    )
+    public ResponseEntity<BrowseTravelsResponse> browse(
+            @Parameter(description = "Filter by destination country (case-insensitive)")
+            @RequestParam(required = false) String country,
+            @Parameter(description = "Filter by destination city (case-insensitive)")
+            @RequestParam(required = false) String city,
+            @Parameter(description = "Minimum price filter")
+            @RequestParam(required = false) BigDecimal minPrice,
+            @Parameter(description = "Maximum price filter")
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @Parameter(description = "Filter by start date (on or after)")
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @Parameter(description = "Filter by end date (on or before)")
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @Parameter(description = "Filter by activity name (partial match, case-insensitive)")
+            @RequestParam(required = false) String activity,
+            @Parameter(description = "Sort by: price, start_date, created_at (default: created_at)")
+            @RequestParam(defaultValue = "created_at") String sortBy,
+            @Parameter(description = "Sort direction: asc or desc (default: desc)")
+            @RequestParam(defaultValue = "desc") String sortDirection,
+            @Parameter(description = "Page number (0-indexed)")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Page size")
+            @RequestParam(defaultValue = "20") int size) {
+
+        BrowseTravelsResponse response = travelService.browse(
+                country, city, minPrice, maxPrice, startDate, endDate, activity,
+                sortBy, sortDirection, page, size);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
