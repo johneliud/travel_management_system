@@ -180,6 +180,24 @@ public class TravelService {
         return toResponse(saved);
     }
 
+    @Transactional
+    public TravelResponse complete(Long travelId, Long callerId, String callerRole) {
+        Travel travel = travelRepository.findById(travelId)
+                .orElseThrow(() -> NotFoundException.of(Travel.class, travelId));
+
+        validateOwnership(travel, callerId, callerRole);
+
+        if (travel.getStatus() != TravelStatus.PUBLISHED) {
+            throw ConflictException.of("INVALID_STATUS_TRANSITION",
+                    "cannot complete a travel in %s status; only PUBLISHED travels can be completed".formatted(travel.getStatus()));
+        }
+
+        travel.setStatus(TravelStatus.COMPLETED);
+
+        Travel saved = travelRepository.save(travel);
+        return toResponse(saved);
+    }
+
     private void validateCompleteness(Travel travel) {
         if (travel.getTitle() == null || travel.getTitle().isBlank()) {
             throw BusinessException.of("INCOMPLETE_TRAVEL", "title is required for publication");
