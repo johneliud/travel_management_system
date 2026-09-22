@@ -121,14 +121,21 @@ class FullAuthLifecycleIntegrationTest extends IntegrationTest {
             .andExpect(status().isUnauthorized())
             .andExpect(jsonPath("$.code").value("INVALID_REFRESH_TOKEN"));
 
-        // Change password
+        // Change password — request OTP first
+        MvcResult otpResult = mockMvc.perform(post("/api/auth/change-password/request-otp")
+                .header(API_VERSION_HEADER, API_VERSION)
+                .header("Authorization", "Bearer " + newAccessToken))
+            .andExpect(status().isOk())
+            .andReturn();
+        String changePwOtp = extractField(otpResult.getResponse().getContentAsString(), "verificationOtp");
+
         mockMvc.perform(post("/api/auth/change-password")
                 .header(API_VERSION_HEADER, API_VERSION)
                 .header("Authorization", "Bearer " + newAccessToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                    {"currentPassword":"%s","newPassword":"%s"}
-                    """.formatted(originalPassword, newPassword)))
+                    {"currentPassword":"%s","newPassword":"%s","otp":"%s"}
+                    """.formatted(originalPassword, newPassword, changePwOtp)))
             .andExpect(status().isNoContent());
 
         // Old refresh token revoked by password change

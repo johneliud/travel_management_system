@@ -223,13 +223,20 @@ class UserProfileIntegrationTest extends IntegrationTest {
             String token = registerUser(email);
             String newPassword = TestData.generateValidPassword();
 
+            MvcResult otpResult = mockMvc.perform(post("/api/auth/change-password/request-otp")
+                    .header(API_VERSION_HEADER, API_VERSION)
+                    .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andReturn();
+            String otp = extractField(otpResult.getResponse().getContentAsString(), "verificationOtp");
+
             mockMvc.perform(post("/api/auth/change-password")
                     .header(API_VERSION_HEADER, API_VERSION)
                     .header("Authorization", "Bearer " + token)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content("""
-                        {"currentPassword":"%s","newPassword":"%s"}
-                        """.formatted(TEST_PASSWORD, newPassword)))
+                        {"currentPassword":"%s","newPassword":"%s","otp":"%s"}
+                        """.formatted(TEST_PASSWORD, newPassword, otp)))
                 .andExpect(status().isNoContent());
 
             mockMvc.perform(post("/api/auth/login")
@@ -248,13 +255,20 @@ class UserProfileIntegrationTest extends IntegrationTest {
             String email = "wrongpw@example.com";
             String token = registerUser(email);
 
+            MvcResult otpResult = mockMvc.perform(post("/api/auth/change-password/request-otp")
+                    .header(API_VERSION_HEADER, API_VERSION)
+                    .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andReturn();
+            String otp = extractField(otpResult.getResponse().getContentAsString(), "verificationOtp");
+
             mockMvc.perform(post("/api/auth/change-password")
                     .header(API_VERSION_HEADER, API_VERSION)
                     .header("Authorization", "Bearer " + token)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content("""
-                        {"currentPassword":"%s","newPassword":"%s"}
-                        """.formatted(TestData.generateValidPassword(), TestData.generateValidPassword())))
+                        {"currentPassword":"%s","newPassword":"%s","otp":"%s"}
+                        """.formatted(TestData.generateValidPassword(), TestData.generateValidPassword(), otp)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value("INVALID_PASSWORD"));
 
@@ -286,13 +300,21 @@ class UserProfileIntegrationTest extends IntegrationTest {
 
             String token = loginAndGetToken(email, TEST_PASSWORD);
             String newPassword = TestData.generateValidPassword();
+
+            MvcResult otpResult = mockMvc.perform(post("/api/auth/change-password/request-otp")
+                    .header(API_VERSION_HEADER, API_VERSION)
+                    .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andReturn();
+            String otp = extractField(otpResult.getResponse().getContentAsString(), "verificationOtp");
+
             mockMvc.perform(post("/api/auth/change-password")
                     .header(API_VERSION_HEADER, API_VERSION)
                     .header("Authorization", "Bearer " + token)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content("""
-                        {"currentPassword":"%s","newPassword":"%s"}
-                        """.formatted(TEST_PASSWORD, newPassword)))
+                        {"currentPassword":"%s","newPassword":"%s","otp":"%s"}
+                        """.formatted(TEST_PASSWORD, newPassword, otp)))
                 .andExpect(status().isNoContent());
 
             mockMvc.perform(post("/api/auth/refresh")
@@ -311,13 +333,20 @@ class UserProfileIntegrationTest extends IntegrationTest {
             String email = "invalidpw@example.com";
             String token = registerUser(email);
 
+            MvcResult otpResult = mockMvc.perform(post("/api/auth/change-password/request-otp")
+                    .header(API_VERSION_HEADER, API_VERSION)
+                    .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andReturn();
+            String otp = extractField(otpResult.getResponse().getContentAsString(), "verificationOtp");
+
             mockMvc.perform(post("/api/auth/change-password")
                     .header(API_VERSION_HEADER, API_VERSION)
                     .header("Authorization", "Bearer " + token)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content("""
-                        {"currentPassword":"%s","newPassword":"weak"}
-                        """.formatted(TEST_PASSWORD)))
+                        {"currentPassword":"%s","newPassword":"weak","otp":"%s"}
+                        """.formatted(TEST_PASSWORD, otp)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));
         }
@@ -333,5 +362,12 @@ class UserProfileIntegrationTest extends IntegrationTest {
                         """.formatted(TestData.generateValidPassword(), TestData.generateValidPassword())))
                 .andExpect(status().isUnauthorized());
         }
+    }
+
+    private String extractField(String json, String field) {
+        String pattern = "\"" + field + "\":\"";
+        int start = json.indexOf(pattern) + pattern.length();
+        int end = json.indexOf("\"", start);
+        return json.substring(start, end);
     }
 }

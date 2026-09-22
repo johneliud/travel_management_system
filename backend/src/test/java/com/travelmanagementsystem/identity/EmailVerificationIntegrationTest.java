@@ -124,7 +124,8 @@ class EmailVerificationIntegrationTest extends IntegrationTest {
             tokenRepository.findByTokenHash(tokenHash).ifPresent(tokenRepository::delete);
 
             EmailVerificationToken expiredToken = new EmailVerificationToken(
-                    user, tokenHash, Instant.now().minus(1, ChronoUnit.HOURS));
+                    user, tokenHash, Instant.now().minus(1, ChronoUnit.HOURS),
+                    com.travelmanagementsystem.identity.domain.VerificationTokenType.EMAIL_VERIFICATION);
             tokenRepository.save(expiredToken);
 
             mockMvc.perform(post("/api/auth/verify-email")
