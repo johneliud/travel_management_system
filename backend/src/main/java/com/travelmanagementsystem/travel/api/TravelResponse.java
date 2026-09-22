@@ -42,6 +42,9 @@ public record TravelResponse(
 	@Schema(description = "Available slots", example = "20")
 	Integer availableSlots,
 
+	@Schema(description = "Whether the travel is fully booked", example = "false")
+	Boolean isFull,
+
 	@Schema(description = "Travel status", example = "DRAFT")
 	String status,
 

@@ -15,6 +15,7 @@ import com.travelmanagementsystem.travel.infrastructure.persistence.TravelReposi
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -198,6 +199,34 @@ public class TravelService {
         return toResponse(saved);
     }
 
+    @Transactional
+    public void reserveSlot(Long travelId) {
+        Travel travel = travelRepository.findByIdForUpdate(travelId)
+                .orElseThrow(() -> NotFoundException.of(Travel.class, travelId));
+
+        if (travel.getAvailableSlots() <= 0) {
+            throw BusinessException.of("TRAVEL_FULL",
+                    "no available slots for travel %d".formatted(travelId));
+        }
+
+        travel.setAvailableSlots(travel.getAvailableSlots() - 1);
+        travelRepository.save(travel);
+    }
+
+    @Transactional
+    public void releaseSlot(Long travelId) {
+        Travel travel = travelRepository.findByIdForUpdate(travelId)
+                .orElseThrow(() -> NotFoundException.of(Travel.class, travelId));
+
+        if (travel.getAvailableSlots() >= travel.getCapacity()) {
+            throw BusinessException.of("SLOTS_EXCEEDED",
+                    "available slots already at capacity for travel %d".formatted(travelId));
+        }
+
+        travel.setAvailableSlots(travel.getAvailableSlots() + 1);
+        travelRepository.save(travel);
+    }
+
     private void validateCompleteness(Travel travel) {
         if (travel.getTitle() == null || travel.getTitle().isBlank()) {
             throw BusinessException.of("INCOMPLETE_TRAVEL", "title is required for publication");
@@ -328,6 +357,7 @@ public class TravelService {
                 t.getPrice(),
                 t.getCapacity(),
                 t.getAvailableSlots(),
+                t.getAvailableSlots() <= 0,
                 t.getStatus().name(),
                 t.getManagerId(),
                 t.getActivities().stream()

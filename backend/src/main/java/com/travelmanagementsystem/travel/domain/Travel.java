@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -64,6 +65,10 @@ public class Travel {
 
     @Column(name = "manager_id", nullable = false)
     private Long managerId;
+
+    @Version
+    @Column(nullable = false)
+    private Long version = 0L;
 
     @Column(nullable = false)
     private Instant createdAt;
@@ -230,6 +235,10 @@ public class Travel {
 
     public Long getManagerId() {
         return managerId;
+    }
+
+    public Long getVersion() {
+        return version;
     }
 
     public Instant getCreatedAt() {
