@@ -93,6 +93,26 @@ public class TravelController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/{id}/cancel")
+    @PreAuthorize("hasAnyRole('" + Roles.TRAVEL_MANAGER + "', '" + Roles.ADMIN + "')")
+    @Operation(
+        summary = "Cancel a travel offering",
+        description = "Transitions a DRAFT or PUBLISHED travel to CANCELLED. COMPLETED travels cannot be cancelled. Already-cancelled travels return an error. Requires header X-API-Version: 1.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Travel cancelled successfully"),
+            @ApiResponse(responseCode = "403", description = "Not the owner or admin", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Travel not found", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Invalid status transition (COMPLETED or already CANCELLED)", content = @Content)
+        }
+    )
+    public ResponseEntity<TravelResponse> cancel(
+            @Parameter(description = "Travel ID") @PathVariable Long id,
+            @AuthenticationPrincipal JwtPrincipal principal) {
+        String callerRole = resolveCallerRole();
+        TravelResponse response = travelService.cancel(id, principal.getUserId(), callerRole);
+        return ResponseEntity.ok(response);
+    }
+
     private String resolveCallerRole() {
         var authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         
