@@ -144,6 +144,7 @@ Owned by the `travel` module (migration `V6__travel_schema.sql`).
 | available_slots | INTEGER | no | — | CHECK: >= 0 AND <= capacity |
 | status | VARCHAR(20) | no | 'DRAFT' | CHECK: DRAFT, PUBLISHED, CANCELLED, COMPLETED |
 | manager_id | BIGINT | no | — | Logical reference to identity.users (no FK constraint) |
+| version | BIGINT | no | 0 | Optimistic locking (V7 migration) |
 | created_at | TIMESTAMPTZ | no | NOW() | |
 | updated_at | TIMESTAMPTZ | no | NOW() | |
 
@@ -181,4 +182,27 @@ Owned by the `travel` module (migration `V6__travel_schema.sql`).
 | Module | Tables | Migrations |
 |--------|--------|------------|
 | identity | users, roles, user_roles, refresh_tokens, email_verification_tokens | V1-V5 |
-| travel | travels, travel_activities, travel_transport | V6 |
+| travel | travels, travel_activities, travel_transport | V6, V7 |
+
+---
+
+## Concurrency Control
+
+### Slot Reservation
+
+The `reserveSlot()` and `releaseSlot()` methods use **pessimistic row locking** (`SELECT ... FOR UPDATE`) to prevent double-booking:
+
+1. `TravelRepository.findByIdForUpdate(id)` acquires an exclusive row lock on the travel
+2. The application checks `available_slots > 0` (or `< capacity` for release)
+3. The slot count is updated and saved
+4. The transaction commits, releasing the lock
+
+This approach:
+- Prevents two concurrent requests from both succeeding on the last slot
+- Is simpler to reason about than optimistic locking with retries
+- Uses PostgreSQL's `FOR UPDATE` lock, which blocks other transactions until the current one completes
+- The `@Version` column provides optimistic locking for other write operations (title changes, status transitions) where the probability of contention is lower
+
+### Optimistic Locking
+
+The `version` column (added in V7) provides optimistic locking for non-slot operations. Hibernate's `@Version` annotation automatically checks the version on `save()` and throws `OptimisticLockingFailureException` if a concurrent modification is detected.
