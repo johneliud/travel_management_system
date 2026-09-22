@@ -14,5 +14,10 @@ public record ChangePasswordRequest(
 	@jakarta.validation.constraints.Pattern(
 		message = "must contain at least one uppercase letter, one lowercase letter, one digit, and one special character",
 		regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&#])[A-Za-z\\d@$!%*?&#]{8,}$")
-	String newPassword
+	String newPassword,
+
+	@Schema(description = "6-digit OTP from the password change request", example = "654321", requiredMode = Schema.RequiredMode.REQUIRED)
+	@jakarta.validation.constraints.NotBlank(message = "is required")
+	@jakarta.validation.constraints.Pattern(regexp = "^\\d{6}$", message = "must be a 6-digit code")
+	String otp
 ) {}
