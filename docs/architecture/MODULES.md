@@ -148,10 +148,10 @@ DRAFT -> publish -> PUBLISHED -> cancel -> CANCELLED
 | From      | To          | Trigger          | Endpoint                           | Constraint                                    |
 |-----------|-------------|------------------|------------------------------------|-----------------------------------------------|
 | DRAFT     | PUBLISHED   | Manager/Admin    | `POST /api/travels/{id}/publish`   | All required fields must be populated          |
-| DRAFT     | CANCELLED   | Manager/Admin    | `PATCH /api/travels/{id}` (future) | —                                              |
-| PUBLISHED | CANCELLED   | Manager/Admin    | `PATCH /api/travels/{id}` (future) | —                                              |
-| CANCELLED | PUBLISHED   | Manager/Admin    | `POST /api/travels/{id}/publish`   | Not yet supported                              |
+| DRAFT     | CANCELLED   | Manager/Admin    | `POST /api/travels/{id}/cancel`    | —                                              |
+| PUBLISHED | CANCELLED   | Manager/Admin    | `POST /api/travels/{id}/cancel`    | Phase 4/5 must handle active subscribers        |
 | COMPLETED | —           | System           | (automated)                        | Travel date has passed                         |
+| CANCELLED | —           | —                | —                                  | Terminal state; no transitions out              |
 
 ### Field Locking After Publication
 
