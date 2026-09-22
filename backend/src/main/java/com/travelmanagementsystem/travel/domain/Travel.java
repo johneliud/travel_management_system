@@ -11,7 +11,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OrderColumn;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -74,12 +73,10 @@ public class Travel {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "travel_activities", joinColumns = @JoinColumn(name = "travel_id"))
-    @OrderColumn(name = "id")
     private List<Activity> activities = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "travel_transport", joinColumns = @JoinColumn(name = "travel_id"))
-    @OrderColumn(name = "id")
     private List<Transport> transport = new ArrayList<>();
 
     protected Travel() {
