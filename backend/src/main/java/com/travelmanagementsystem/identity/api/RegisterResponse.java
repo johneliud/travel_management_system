@@ -15,5 +15,8 @@ public record RegisterResponse(
 	String status,
 
 	@Schema(description = "Account creation timestamp", example = "2026-09-20T12:00:00Z")
-	Instant createdAt
+	Instant createdAt,
+
+	@Schema(description = "6-digit email verification OTP (non-production only; in production this will be sent via email)", example = "123456")
+	String verificationOtp
 ) {}
