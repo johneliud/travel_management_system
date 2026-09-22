@@ -15,7 +15,6 @@ import com.travelmanagementsystem.travel.infrastructure.persistence.TravelReposi
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -136,6 +135,72 @@ public class TravelService {
 
         Travel saved = travelRepository.save(travel);
         return toResponse(saved);
+    }
+
+    @Transactional
+    public TravelResponse publish(Long travelId, Long callerId, String callerRole) {
+        Travel travel = travelRepository.findById(travelId)
+                .orElseThrow(() -> NotFoundException.of(Travel.class, travelId));
+
+        validateOwnership(travel, callerId, callerRole);
+
+        if (travel.getStatus() != TravelStatus.DRAFT) {
+            throw ConflictException.of("INVALID_STATUS_TRANSITION",
+                    "cannot publish a travel in %s status; only DRAFT travels can be published".formatted(travel.getStatus()));
+        }
+
+        validateCompleteness(travel);
+
+        travel.setStatus(TravelStatus.PUBLISHED);
+
+        Travel saved = travelRepository.save(travel);
+        return toResponse(saved);
+    }
+
+    private void validateCompleteness(Travel travel) {
+        if (travel.getTitle() == null || travel.getTitle().isBlank()) {
+            throw BusinessException.of("INCOMPLETE_TRAVEL", "title is required for publication");
+        }
+        
+        if (travel.getDescription() == null || travel.getDescription().isBlank()) {
+            throw BusinessException.of("INCOMPLETE_TRAVEL", "description is required for publication");
+        }
+        
+        if (travel.getDestinationCountry() == null || travel.getDestinationCountry().isBlank()) {
+            throw BusinessException.of("INCOMPLETE_TRAVEL", "destinationCountry is required for publication");
+        }
+        
+        if (travel.getDestinationCity() == null || travel.getDestinationCity().isBlank()) {
+            throw BusinessException.of("INCOMPLETE_TRAVEL", "destinationCity is required for publication");
+        }
+        
+        if (travel.getStartDate() == null) {
+            throw BusinessException.of("INCOMPLETE_TRAVEL", "startDate is required for publication");
+        }
+        
+        if (travel.getEndDate() == null) {
+            throw BusinessException.of("INCOMPLETE_TRAVEL", "endDate is required for publication");
+        }
+        
+        if (travel.getDurationDays() == null) {
+            throw BusinessException.of("INCOMPLETE_TRAVEL", "durationDays is required for publication");
+        }
+        
+        if (travel.getPrice() == null) {
+            throw BusinessException.of("INCOMPLETE_TRAVEL", "price is required for publication");
+        }
+        
+        if (travel.getCapacity() == null) {
+            throw BusinessException.of("INCOMPLETE_TRAVEL", "capacity is required for publication");
+        }
+        
+        if (travel.getActivities() == null || travel.getActivities().isEmpty()) {
+            throw BusinessException.of("INCOMPLETE_TRAVEL", "at least one activity is required for publication");
+        }
+        
+        if (travel.getTransport() == null || travel.getTransport().isEmpty()) {
+            throw BusinessException.of("INCOMPLETE_TRAVEL", "at least one transport arrangement is required for publication");
+        }
     }
 
     private void validateOwnership(Travel travel, Long callerId, String callerRole) {
