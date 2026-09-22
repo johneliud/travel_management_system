@@ -119,4 +119,12 @@ public class User {
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
     }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
 }
