@@ -157,6 +157,29 @@ public class TravelService {
         return toResponse(saved);
     }
 
+    @Transactional
+    public TravelResponse cancel(Long travelId, Long callerId, String callerRole) {
+        Travel travel = travelRepository.findById(travelId)
+                .orElseThrow(() -> NotFoundException.of(Travel.class, travelId));
+
+        validateOwnership(travel, callerId, callerRole);
+
+        if (travel.getStatus() == TravelStatus.COMPLETED) {
+            throw ConflictException.of("INVALID_STATUS_TRANSITION",
+                    "cannot cancel a travel in COMPLETED status");
+        }
+
+        if (travel.getStatus() == TravelStatus.CANCELLED) {
+            throw ConflictException.of("INVALID_STATUS_TRANSITION",
+                    "travel is already cancelled");
+        }
+
+        travel.setStatus(TravelStatus.CANCELLED);
+
+        Travel saved = travelRepository.save(travel);
+        return toResponse(saved);
+    }
+
     private void validateCompleteness(Travel travel) {
         if (travel.getTitle() == null || travel.getTitle().isBlank()) {
             throw BusinessException.of("INCOMPLETE_TRAVEL", "title is required for publication");
