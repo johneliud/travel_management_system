@@ -73,6 +73,26 @@ public class TravelController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/{id}/publish")
+    @PreAuthorize("hasAnyRole('" + Roles.TRAVEL_MANAGER + "', '" + Roles.ADMIN + "')")
+    @Operation(
+        summary = "Publish a travel offering",
+        description = "Transitions a DRAFT travel to PUBLISHED, making it visible to travelers. The travel must have all required fields populated (title, description, destination, dates, duration, price, capacity, at least one activity and one transport). Only DRAFT travels can be published. Requires header X-API-Version: 1.",
+        responses = {
+            @ApiResponse(responseCode = "200", description="Travel published successfully"),
+            @ApiResponse(responseCode = "403", description = "Not the owner or admin", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Travel not found", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Invalid status transition (travel is not DRAFT)", content = @Content)
+        }
+    )
+    public ResponseEntity<TravelResponse> publish(
+            @Parameter(description = "Travel ID") @PathVariable Long id,
+            @AuthenticationPrincipal JwtPrincipal principal) {
+        String callerRole = resolveCallerRole();
+        TravelResponse response = travelService.publish(id, principal.getUserId(), callerRole);
+        return ResponseEntity.ok(response);
+    }
+
     private String resolveCallerRole() {
         var authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         
