@@ -127,9 +127,9 @@ class RoleAuthorizationIntegrationTest extends IntegrationTest {
                     .header(API_VERSION_HEADER, API_VERSION)
                     .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[?(@.email == 'admin@example.com')].roles[?(@ == 'ADMIN')]").exists())
-                .andExpect(jsonPath("$[?(@.email == 'admin@example.com')].status").value("ACTIVE"));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content[?(@.email == 'admin@example.com')].roles[?(@ == 'ADMIN')]").exists())
+                .andExpect(jsonPath("$.content[?(@.email == 'admin@example.com')].status").value("ACTIVE"));
         }
 
         @Test
