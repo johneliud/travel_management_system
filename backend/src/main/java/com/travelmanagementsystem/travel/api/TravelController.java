@@ -113,6 +113,26 @@ public class TravelController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/{id}/complete")
+    @PreAuthorize("hasAnyRole('" + Roles.TRAVEL_MANAGER + "', '" + Roles.ADMIN + "')")
+    @Operation(
+        summary = "Mark a travel offering as completed",
+        description = "Transitions a PUBLISHED travel to COMPLETED. Only PUBLISHED travels can be completed. Requires header X-API-Version: 1.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Travel marked as completed"),
+            @ApiResponse(responseCode = "403", description = "Not the owner or admin", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Travel not found", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Invalid status transition (travel is not PUBLISHED)", content = @Content)
+        }
+    )
+    public ResponseEntity<TravelResponse> complete(
+            @Parameter(description = "Travel ID") @PathVariable Long id,
+            @AuthenticationPrincipal JwtPrincipal principal) {
+        String callerRole = resolveCallerRole();
+        TravelResponse response = travelService.complete(id, principal.getUserId(), callerRole);
+        return ResponseEntity.ok(response);
+    }
+
     private String resolveCallerRole() {
         var authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         
