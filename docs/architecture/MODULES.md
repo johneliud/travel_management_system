@@ -137,10 +137,9 @@ com.travelmanagementsystem
 Travel offerings progress through a state machine:
 
 ```
-DRAFT -> publish -> PUBLISHED -> cancel -> CANCELLED
-  │                                           │
-  └───────────────────────────────────────────┘
-                  (any state -> CANCELLED)
+DRAFT -> publish -> PUBLISHED -> complete -> COMPLETED
+  │                    │
+  └──cancel -> CANCELLED
 ```
 
 ### Status Transitions
@@ -149,8 +148,9 @@ DRAFT -> publish -> PUBLISHED -> cancel -> CANCELLED
 |-----------|-------------|------------------|------------------------------------|-----------------------------------------------|
 | DRAFT     | PUBLISHED   | Manager/Admin    | `POST /api/travels/{id}/publish`   | All required fields must be populated          |
 | DRAFT     | CANCELLED   | Manager/Admin    | `POST /api/travels/{id}/cancel`    | —                                              |
+| PUBLISHED | COMPLETED   | Manager/Admin    | `POST /api/travels/{id}/complete`  | Explicit action; no automatic transition yet   |
 | PUBLISHED | CANCELLED   | Manager/Admin    | `POST /api/travels/{id}/cancel`    | Phase 4/5 must handle active subscribers        |
-| COMPLETED | —           | System           | (automated)                        | Travel date has passed                         |
+| COMPLETED | —           | —                | —                                  | Terminal state; no transitions out              |
 | CANCELLED | —           | —                | —                                  | Terminal state; no transitions out              |
 
 ### Field Locking After Publication
