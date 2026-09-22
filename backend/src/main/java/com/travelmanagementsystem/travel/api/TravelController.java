@@ -95,6 +95,27 @@ public class TravelController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @GetMapping("/mine")
+    @PreAuthorize("hasAnyRole('" + Roles.TRAVEL_MANAGER + "', '" + Roles.ADMIN + "')")
+    @Operation(
+        summary = "List the authenticated manager's own travels",
+        description = "Returns all travels owned by the authenticated manager, across all statuses (DRAFT, PUBLISHED, CANCELLED, COMPLETED). Paginated and sorted by creation date descending. Restricted to Travel Managers and Admins. Requires header X-API-Version: 1.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Paginated list of the manager's travels"),
+            @ApiResponse(responseCode = "401", description = "Authentication required", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Insufficient role", content = @Content)
+        }
+    )
+    public ResponseEntity<BrowseTravelsResponse> listMyTravels(
+            @AuthenticationPrincipal JwtPrincipal principal,
+            @Parameter(description = "Page number (0-indexed)")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Page size")
+            @RequestParam(defaultValue = "20") int size) {
+        BrowseTravelsResponse response = travelService.listMyTravels(principal.getUserId(), page, size);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/{id}")
     @Operation(
         summary = "Get full detail of a travel offering",

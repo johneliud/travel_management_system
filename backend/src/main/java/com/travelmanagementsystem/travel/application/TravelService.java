@@ -166,6 +166,23 @@ public class TravelService {
         throw NotFoundException.of(Travel.class, travelId);
     }
 
+    @Transactional(readOnly = true)
+    public BrowseTravelsResponse listMyTravels(Long managerId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Travel> result = travelRepository.findByManagerId(managerId, pageable);
+
+        List<TravelResponse> travels = result.getContent().stream()
+                .map(this::toResponse)
+                .toList();
+
+        return new BrowseTravelsResponse(
+                travels,
+                result.getNumber(),
+                result.getSize(),
+                result.getTotalElements(),
+                result.getTotalPages());
+    }
+
     @Transactional
     public TravelResponse updateTravel(Long travelId, UpdateTravelRequest request, Long callerId, String callerRole) {
         Travel travel = travelRepository.findById(travelId)
