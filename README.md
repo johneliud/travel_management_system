@@ -72,5 +72,3 @@ See [`frontend/README.md`](frontend/README.md) for scripts, folder structure, an
 | [`docs/api/README.md`](docs/api/README.md) | API error format, status codes, conventions |
 | [`docs/architecture/MODULES.md`](docs/architecture/MODULES.md) | Module boundaries, ArchUnit rules |
 | [`docs/architecture/DATA.md`](docs/architecture/DATA.md) | Data model and entity relationships |
-| [`docs/decisions/`](docs/decisions/) | Architecture Decision Records |
-| [`GUIDE.md`](GUIDE.md) | Agent coding guidelines (Angular, TypeScript, backend) |
