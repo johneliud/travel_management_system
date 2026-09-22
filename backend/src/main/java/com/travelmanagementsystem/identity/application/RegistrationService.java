@@ -21,11 +21,17 @@ public class RegistrationService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordHasher passwordHasher;
+    private final EmailVerificationService emailVerificationService;
 
-    public RegistrationService(UserRepository userRepository, RoleRepository roleRepository, PasswordHasher passwordHasher) {
+    public RegistrationService(
+            UserRepository userRepository,
+            RoleRepository roleRepository,
+            PasswordHasher passwordHasher,
+            EmailVerificationService emailVerificationService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordHasher = passwordHasher;
+        this.emailVerificationService = emailVerificationService;
     }
 
     @Transactional
@@ -45,13 +51,16 @@ public class RegistrationService {
 
         User saved = userRepository.save(user);
 
+        String otp = emailVerificationService.generateOtp(saved);
+
         log.debug("Registered new user with id {}", saved.getId());
 
         return new RegisterResponse(
             saved.getId(),
             saved.getEmail(),
             saved.getStatus(),
-            saved.getCreatedAt()
+            saved.getCreatedAt(),
+            otp
         );
     }
 }
