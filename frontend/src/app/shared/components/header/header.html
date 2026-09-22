@@ -1,0 +1,171 @@
+<header class="top-0 z-(--z-sticky) relative bg-(--color-surface) border-b border-(--color-border)">
+  @if (isLoggedIn() && !emailVerified()) {
+    <div
+      class="bg-(--color-warning-light) text-(--color-warning) text-sm px-4 py-2 flex items-center justify-center gap-2 cursor-pointer hover:bg-(--color-warning)/10 transition-colors"
+      (click)="openVerifyEmail()"
+      role="button"
+      tabindex="0"
+      (keydown.enter)="openVerifyEmail()"
+      (keydown.space)="openVerifyEmail()"
+    >
+      <app-icon name="mail" [size]="16" />
+      <span>Your email is not verified. <strong>Click here to verify</strong>.</span>
+    </div>
+  }
+
+  <div class="max-w-screen-2xl mx-auto flex items-center justify-between px-4 sm:px-6 h-(--topnav-height)">
+    <a routerLink="/" class="text-xl font-semibold text-(--color-text) font-(family-name:(--font-heading))">
+      TMS
+    </a>
+
+    <nav class="hidden md:flex items-center gap-1" aria-label="Main navigation">
+      @for (item of visibleNavItems(); track item.route) {
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="bg-(--color-primary-light) text-(--color-primary)"
+          class="px-3 py-2 rounded-(--radius-md) text-sm font-medium text-(--color-text-secondary)"
+        >
+          {{ item.label }}
+        </a>
+      }
+    </nav>
+
+    <div class="flex items-center gap-3">
+      @if (isLoggedIn()) {
+        <div class="hidden md:block relative" data-user-menu>
+          <button
+            (click)="toggleUserMenu()"
+            class="flex items-center gap-2 px-3 py-2 rounded-(--radius-md) text-sm font-medium text-(--color-text-secondary) hover:bg-(--color-surface-sunken) transition-colors"
+            [attr.aria-expanded]="userMenuOpen()"
+            aria-haspopup="true"
+          >
+            <span class="w-8 h-8 rounded-full bg-(--color-primary-light) text-(--color-primary) flex items-center justify-center text-sm font-semibold">
+              {{ user()?.email?.charAt(0) | uppercase }}
+            </span>
+            <span class="max-w-[120px] truncate">{{ user()?.email }}</span>
+            <app-icon name="chevron-down" [size]="16" [class]="userMenuOpen() ? 'transition-transform rotate-180' : 'transition-transform'" />
+          </button>
+
+          @if (userMenuOpen()) {
+            <div class="absolute right-0 mt-2 bg-(--color-surface) border border-(--color-border) rounded-(--radius-lg) shadow-(--shadow-lg) py-1 animate-slide-in">
+              <div class="px-4 py-2 border-b border-(--color-border)">
+                <p class="text-sm font-medium text-(--color-text) truncate">{{ user()?.email }}</p>
+                <p class="text-xs text-(--color-text-muted)">{{ roles().join(', ') }}</p>
+              </div>
+              <a routerLink="/profile" class="flex items-center gap-2 px-4 py-2 text-sm text-(--color-text-secondary) hover:bg-(--color-surface-sunken)" (click)="closeUserMenu()">
+                <app-icon name="user" [size]="16" />
+                Profile
+              </a>
+              <a routerLink="/change-password" class="flex items-center gap-2 px-4 py-2 text-sm text-(--color-text-secondary) hover:bg-(--color-surface-sunken)" (click)="closeUserMenu()">
+                <app-icon name="key-round" [size]="16" />
+                Change Password
+              </a>
+              @if (!emailVerified()) {
+                <button (click)="openVerifyEmail()" class="flex items-center gap-2 px-4 py-2 text-sm text-(--color-warning) hover:bg-(--color-surface-sunken) w-full text-left">
+                  <app-icon name="mail" [size]="16" />
+                  Verify Email
+                </button>
+              }
+              <hr class="my-1 border-(--color-border)" />
+              <button (click)="logout()" class="flex items-center gap-2 px-4 py-2 text-sm text-(--color-error) hover:bg-(--color-error-light) w-full text-left">
+                <app-icon name="log-out" [size]="16" />
+                Log Out
+              </button>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="hidden md:flex items-center gap-2">
+          <!--<button
+            (click)="openLogin()"
+            class="px-8 py-2 text-sm font-medium text-(--color-text-secondary) border border-current hover:text-(--color-text) rounded-(--radius-2xl) transition-colors"
+          >
+            Log In
+          </button>-->
+          <button
+            (click)="openRegister()"
+            class="px-8 py-2 text-sm font-medium text-(--color-text-inverse) bg-(--color-primary) hover:bg-(--color-primary-hover) rounded-(--radius-2xl) transition-colors"
+          >
+            Register
+          </button>
+        </div>
+      }
+
+      <button
+        class="md:hidden p-2 rounded-(--radius-md) text-(--color-text-secondary) hover:bg-(--color-surface-sunken)"
+        (click)="toggleMobileMenu()"
+        [attr.aria-expanded]="mobileMenuOpen()"
+        aria-controls="mobile-menu"
+        aria-label="Toggle navigation menu"
+      >
+        @if (mobileMenuOpen()) {
+          <app-icon name="x" [size]="24" />
+        } @else {
+          <app-icon name="menu" [size]="24" />
+        }
+      </button>
+    </div>
+  </div>
+
+  @if (mobileMenuOpen()) {
+    <div id="mobile-menu" class="absolute right-0 md:hidden w-[65vw] border-t border-(--color-border) bg-(--color-surface) shadow-(--shadow-lg) animate-slide-in">
+      <nav class="px-4 py-3 space-y-1" aria-label="Mobile navigation">
+        @for (item of visibleNavItems(); track item.route) {
+          <a
+            [routerLink]="item.route"
+            routerLinkActive="bg-(--color-primary-light) text-(--color-primary)"
+            class="block px-3 py-2 rounded-(--radius-md) text-sm font-medium text-(--color-text-secondary) hover:bg-(--color-surface-sunken)"
+            (click)="mobileMenuOpen.set(false)"
+          >
+            {{ item.label }}
+          </a>
+        }
+      </nav>
+
+      <div class="border-t border-(--color-border) px-4 py-3">
+        @if (isLoggedIn()) {
+          <div class="flex items-center gap-3 mb-3">
+            <span class="w-10 h-10 rounded-full bg-(--color-primary-light) text-(--color-primary) flex items-center justify-center text-base font-semibold">
+              {{ user()?.email?.charAt(0) | uppercase }}
+            </span>
+            <div>
+              <p class="text-sm font-medium text-(--color-text)">{{ user()?.email }}</p>
+              <p class="text-xs text-(--color-text-muted)">{{ roles().join(', ') }}</p>
+            </div>
+          </div>
+          <div class="space-y-1">
+            <a routerLink="/profile" class="block px-3 py-2 rounded-(--radius-md) text-sm text-(--color-text-secondary) hover:bg-(--color-surface-sunken)" (click)="mobileMenuOpen.set(false)">
+              Profile
+            </a>
+            <a routerLink="/change-password" class="block px-3 py-2 rounded-(--radius-md) text-sm text-(--color-text-secondary) hover:bg-(--color-surface-sunken)" (click)="mobileMenuOpen.set(false)">
+              Change Password
+            </a>
+            @if (!emailVerified()) {
+              <button (click)="openVerifyEmail()" class="block w-full text-left px-3 py-2 rounded-(--radius-md) text-sm text-(--color-warning) hover:bg-(--color-surface-sunken)">
+                Verify Email
+              </button>
+            }
+            <button (click)="logout()" class="block w-full text-left px-3 py-2 rounded-(--radius-md) text-sm text-(--color-error) hover:bg-(--color-error-light)">
+              Log Out
+            </button>
+          </div>
+        } @else {
+          <div class="flex flex-col gap-2">
+            <!--<button
+              (click)="openLogin()"
+              class="px-8 py-2 text-sm font-medium text-(--color-text-secondary) border border-current hover:text-(--color-text) rounded-(--radius-2xl) transition-colors"
+            >
+              Log In
+            </button>-->
+            <button
+              (click)="openRegister()"
+              class="px-8 py-2 text-sm font-medium text-(--color-text-inverse) bg-(--color-primary) hover:bg-(--color-primary-hover) rounded-(--radius-2xl) transition-colors"
+            >
+              Register
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</header>
