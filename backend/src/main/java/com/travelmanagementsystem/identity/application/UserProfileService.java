@@ -4,6 +4,7 @@ import com.travelmanagementsystem.identity.api.ChangePasswordRequest;
 import com.travelmanagementsystem.identity.api.ProfileResponse;
 import com.travelmanagementsystem.identity.api.UpdateProfileRequest;
 import com.travelmanagementsystem.identity.domain.User;
+import com.travelmanagementsystem.identity.domain.VerificationTokenType;
 import com.travelmanagementsystem.identity.infrastructure.persistence.RefreshTokenRepository;
 import com.travelmanagementsystem.identity.infrastructure.persistence.UserRepository;
 import com.travelmanagementsystem.shared.exception.ConflictException;
@@ -23,14 +24,17 @@ public class UserProfileService {
     private final UserRepository userRepository;
     private final PasswordHasher passwordHasher;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final EmailVerificationService emailVerificationService;
 
     public UserProfileService(
             UserRepository userRepository,
             PasswordHasher passwordHasher,
-            RefreshTokenRepository refreshTokenRepository) {
+            RefreshTokenRepository refreshTokenRepository,
+            EmailVerificationService emailVerificationService) {
         this.userRepository = userRepository;
         this.passwordHasher = passwordHasher;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.emailVerificationService = emailVerificationService;
     }
 
     @Transactional(readOnly = true)
@@ -63,6 +67,8 @@ public class UserProfileService {
     public void changePassword(Long userId, ChangePasswordRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> NotFoundException.of(User.class, userId));
+
+        emailVerificationService.verifyOtp(user, request.otp(), VerificationTokenType.PASSWORD_CHANGE);
 
         if (!passwordHasher.verify(request.currentPassword(), user.getPasswordHash())) {
             log.debug("Password change attempt with wrong current password for user with id {}", userId);

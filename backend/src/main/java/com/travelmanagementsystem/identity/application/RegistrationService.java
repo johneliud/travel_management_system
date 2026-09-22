@@ -4,6 +4,7 @@ import com.travelmanagementsystem.identity.api.RegisterRequest;
 import com.travelmanagementsystem.identity.api.RegisterResponse;
 import com.travelmanagementsystem.identity.domain.Role;
 import com.travelmanagementsystem.identity.domain.User;
+import com.travelmanagementsystem.identity.domain.VerificationTokenType;
 import com.travelmanagementsystem.identity.infrastructure.persistence.RoleRepository;
 import com.travelmanagementsystem.identity.infrastructure.persistence.UserRepository;
 import com.travelmanagementsystem.shared.exception.ConflictException;
@@ -51,7 +52,7 @@ public class RegistrationService {
 
         User saved = userRepository.save(user);
 
-        String otp = emailVerificationService.generateOtp(saved);
+        String otp = emailVerificationService.generateOtp(saved, VerificationTokenType.EMAIL_VERIFICATION);
 
         log.debug("Registered new user with id {}", saved.getId());
 
