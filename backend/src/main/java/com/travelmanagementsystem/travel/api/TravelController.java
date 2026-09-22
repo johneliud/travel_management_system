@@ -95,6 +95,24 @@ public class TravelController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @GetMapping("/{id}")
+    @Operation(
+        summary = "Get full detail of a travel offering",
+        description = "Returns full detail including activities and transport. PUBLISHED/COMPLETED travels are visible to all authenticated users. DRAFT/CANCELLED travels are visible only to the owning manager or an admin. Returns 404 for unauthorized access to avoid leaking existence of draft content. Requires header X-API-Version: 1.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Travel detail returned successfully"),
+            @ApiResponse(responseCode = "401", description = "Authentication required", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Travel not found or not visible", content = @Content)
+        }
+    )
+    public ResponseEntity<TravelResponse> getTravel(
+            @Parameter(description = "Travel ID") @PathVariable Long id,
+            @AuthenticationPrincipal JwtPrincipal principal) {
+        String callerRole = resolveCallerRole();
+        TravelResponse response = travelService.getTravel(id, principal.getUserId(), callerRole);
+        return ResponseEntity.ok(response);
+    }
+
     @PatchMapping("/{id}")
     @PreAuthorize("hasAnyRole('" + Roles.TRAVEL_MANAGER + "', '" + Roles.ADMIN + "')")
     @Operation(

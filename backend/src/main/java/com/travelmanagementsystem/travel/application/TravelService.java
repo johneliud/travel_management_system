@@ -143,6 +143,29 @@ public class TravelService {
         };
     }
 
+    @Transactional(readOnly = true)
+    public TravelResponse getTravel(Long travelId, Long callerId, String callerRole) {
+        Travel travel = travelRepository.findById(travelId)
+                .orElseThrow(() -> NotFoundException.of(Travel.class, travelId));
+
+        boolean isManagerOrAdmin = Roles.TRAVEL_MANAGER.equals(callerRole) || Roles.ADMIN.equals(callerRole);
+        boolean isOwner = travel.getManagerId() != null && travel.getManagerId().equals(callerId);
+
+        if (travel.getStatus() == TravelStatus.PUBLISHED || travel.getStatus() == TravelStatus.COMPLETED) {
+            return toResponse(travel);
+        }
+
+        if (isManagerOrAdmin && isOwner) {
+            return toResponse(travel);
+        }
+
+        if (Roles.ADMIN.equals(callerRole)) {
+            return toResponse(travel);
+        }
+
+        throw NotFoundException.of(Travel.class, travelId);
+    }
+
     @Transactional
     public TravelResponse updateTravel(Long travelId, UpdateTravelRequest request, Long callerId, String callerRole) {
         Travel travel = travelRepository.findById(travelId)
