@@ -44,7 +44,7 @@ public class RegistrationService {
 
         String hashedPassword = passwordHasher.hash(request.password());
 
-        User user = new User(request.email(), hashedPassword);
+        User user = new User(request.email(), hashedPassword, request.firstName(), request.lastName());
 
         Role travelerRole = roleRepository.findByName(Roles.TRAVELER)
             .orElseThrow(() -> new IllegalStateException("TRAVELER role not found"));
@@ -58,6 +58,8 @@ public class RegistrationService {
 
         return new RegisterResponse(
             saved.getId(),
+            saved.getFirstName(),
+            saved.getLastName(),
             saved.getEmail(),
             saved.getStatus(),
             saved.getCreatedAt(),
