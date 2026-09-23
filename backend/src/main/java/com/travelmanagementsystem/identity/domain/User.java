@@ -31,6 +31,12 @@ public class User {
     @Column(nullable = false)
     private String passwordHash;
 
+    @Column(length = 100)
+    private String firstName;
+
+    @Column(length = 100)
+    private String lastName;
+
     @Column(nullable = false, length = 20)
     private String status = "ACTIVE";
 
@@ -61,6 +67,15 @@ public class User {
         this.updatedAt = Instant.now();
     }
 
+    public User(String email, String passwordHash, String firstName, String lastName) {
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
+    }
+
     @PrePersist
     void prePersist() {
         this.createdAt = Instant.now();
@@ -78,6 +93,14 @@ public class User {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
     }
 
     public String getPasswordHash() {
@@ -110,6 +133,14 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public void setEmailVerified(Boolean emailVerified) {
