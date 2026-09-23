@@ -49,7 +49,7 @@ export class VerifyEmailView implements OnInit, OnDestroy {
     const input = event.target as HTMLInputElement;
     const value = input.value.replace(/\D/g, '').slice(0, 1);
 
-    this.digits.update(d => {
+    this.digits.update((d) => {
       const updated = [...d];
       updated[index] = value;
       return updated;
@@ -66,7 +66,7 @@ export class VerifyEmailView implements OnInit, OnDestroy {
   onKeyDown(index: number, event: KeyboardEvent): void {
     if (event.key === 'Backspace' && !this.digits()[index] && index > 0) {
       this.focusInput(index - 1);
-      this.digits.update(d => {
+      this.digits.update((d) => {
         const updated = [...d];
         updated[index - 1] = '';
         return updated;

@@ -1,12 +1,16 @@
 @if (error()) {
-  <div class="mb-4 px-4 py-3 rounded-(--radius-md) bg-(--color-error-light) text-(--color-error) text-sm">
+  <div
+    class="mb-4 px-4 py-3 rounded-(--radius-md) bg-(--color-error-light) text-(--color-error) text-sm"
+  >
     {{ error() }}
   </div>
 }
 
 <form (submit)="$event.preventDefault(); onSubmit()" class="space-y-4" novalidate>
   <div>
-    <label for="login-email" class="block text-sm font-medium text-(--color-text-secondary) mb-1">Email</label>
+    <label for="login-email" class="block text-sm font-medium text-(--color-text-secondary) mb-1"
+      >Email</label
+    >
     <input
       id="login-email"
       type="email"
@@ -26,7 +30,9 @@
   </div>
 
   <div>
-    <label for="login-password" class="block text-sm font-medium text-(--color-text-secondary) mb-1">Password</label>
+    <label for="login-password" class="block text-sm font-medium text-(--color-text-secondary) mb-1"
+      >Password</label
+    >
     <div class="relative">
       <input
         id="login-password"
@@ -80,4 +86,3 @@
     Log In
   </button>
 </form>
-

@@ -261,12 +261,14 @@ a {
   text-decoration: none;
 }
 
-a, button {
+a,
+button {
   cursor: pointer;
 }
 
-a:hover, button:hover {
-  opacity: .9;
+a:hover,
+button:hover {
+  opacity: 0.9;
 }
 
 a:hover {

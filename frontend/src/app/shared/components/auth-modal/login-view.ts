@@ -22,7 +22,7 @@ export class LoginView {
   readonly touchedFields = signal<Set<string>>(new Set());
 
   markTouched(field: string): void {
-    this.touchedFields.update(fields => new Set(fields).add(field));
+    this.touchedFields.update((fields) => new Set(fields).add(field));
   }
 
   isTouched(field: string): boolean {
@@ -44,10 +44,12 @@ export class LoginView {
   }
 
   get formValid(): boolean {
-    return this.emailError === null
-      && this.passwordError === null
-      && this.email().length > 0
-      && this.password().length > 0;
+    return (
+      this.emailError === null &&
+      this.passwordError === null &&
+      this.email().length > 0 &&
+      this.password().length > 0
+    );
   }
 
   switchView(view: 'register' | 'forgot-password'): void {
@@ -56,7 +58,7 @@ export class LoginView {
   }
 
   togglePassword(): void {
-    this.showPassword.update(v => !v);
+    this.showPassword.update((v) => !v);
   }
 
   async onSubmit(): Promise<void> {

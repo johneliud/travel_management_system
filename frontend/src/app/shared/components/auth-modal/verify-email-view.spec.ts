@@ -41,7 +41,10 @@ describe('VerifyEmailView', () => {
       providers: [
         { provide: AuthModalService, useValue: authModalSpy },
         { provide: SessionService, useValue: sessionSpy },
-        { provide: ENVIRONMENT, useValue: { production: true, apiBaseUrl: 'http://localhost:8080' } },
+        {
+          provide: ENVIRONMENT,
+          useValue: { production: true, apiBaseUrl: 'http://localhost:8080' },
+        },
       ],
     }).compileComponents();
 
@@ -177,15 +180,16 @@ describe('VerifyEmailView', () => {
   describe('resend', () => {
     it('should send resend request and start cooldown', async () => {
       vi.useFakeTimers();
-      fetchSpy.mockResolvedValueOnce(
-        jsonResponse({ verificationOtp: '654321' }, { status: 200 }),
-      );
+      fetchSpy.mockResolvedValueOnce(jsonResponse({ verificationOtp: '654321' }, { status: 200 }));
 
       await component.onResend();
 
-      expect(fetchSpy).toHaveBeenCalledWith('/api/auth/resend-verification', expect.objectContaining({
-        body: JSON.stringify({ email: 'test@example.com' }),
-      }));
+      expect(fetchSpy).toHaveBeenCalledWith(
+        '/api/auth/resend-verification',
+        expect.objectContaining({
+          body: JSON.stringify({ email: 'test@example.com' }),
+        }),
+      );
       expect(component.canResend()).toBeFalsy();
       expect(component.cooldown()).toBe(60);
       expect(component.success()).toBe('A new code has been sent to your email.');
@@ -195,9 +199,7 @@ describe('VerifyEmailView', () => {
 
     it('should pre-fill OTP from resend response in non-production', async () => {
       vi.useFakeTimers();
-      fetchSpy.mockResolvedValueOnce(
-        jsonResponse({ verificationOtp: '654321' }, { status: 200 }),
-      );
+      fetchSpy.mockResolvedValueOnce(jsonResponse({ verificationOtp: '654321' }, { status: 200 }));
 
       await component.onResend();
 
@@ -209,7 +211,10 @@ describe('VerifyEmailView', () => {
     it('should show cooldown message on rate limit', async () => {
       vi.useFakeTimers();
       fetchSpy.mockResolvedValueOnce(
-        jsonResponse({ message: 'please wait 45 seconds before requesting a new code' }, { status: 429 }),
+        jsonResponse(
+          { message: 'please wait 45 seconds before requesting a new code' },
+          { status: 429 },
+        ),
       );
 
       await component.onResend();

@@ -1,4 +1,13 @@
-import { Component, inject, effect, viewChild, type ElementRef, createComponent, EnvironmentInjector, ApplicationRef } from '@angular/core';
+import {
+  Component,
+  inject,
+  effect,
+  viewChild,
+  type ElementRef,
+  createComponent,
+  EnvironmentInjector,
+  ApplicationRef,
+} from '@angular/core';
 import { ModalService } from '../../../core/modal/modal.service';
 
 @Component({
@@ -44,7 +53,10 @@ export class ModalHostComponent {
     });
   }
 
-  private renderContent(config: ReturnType<ModalService['activeConfig']>, container: HTMLElement): void {
+  private renderContent(
+    config: ReturnType<ModalService['activeConfig']>,
+    container: HTMLElement,
+  ): void {
     if (this.currentHostElement) {
       if (this.currentComponentRef) {
         this.appRef.detachView(this.currentComponentRef.hostView);
@@ -96,7 +108,7 @@ export class ModalHostComponent {
     if (!container) return;
 
     const focusableElements = container.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
     ) as NodeListOf<HTMLElement>;
 
     if (focusableElements.length === 0) return;

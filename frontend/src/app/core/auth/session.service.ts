@@ -7,7 +7,8 @@ export interface User {
   roles: string[];
 }
 
-export type AuthModalView = 'login' | 'register' | 'verify-email' | 'forgot-password' | 'reset-password' | 'change-password';
+export type AuthModalView =
+  'login' | 'register' | 'verify-email' | 'forgot-password' | 'reset-password' | 'change-password';
 
 @Injectable({ providedIn: 'root' })
 export class SessionService {

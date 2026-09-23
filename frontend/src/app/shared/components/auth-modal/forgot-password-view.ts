@@ -17,7 +17,7 @@ export class ForgotPasswordView {
   readonly touchedFields = signal<Set<string>>(new Set());
 
   markTouched(field: string): void {
-    this.touchedFields.update(fields => new Set(fields).add(field));
+    this.touchedFields.update((fields) => new Set(fields).add(field));
   }
 
   isTouched(field: string): boolean {

@@ -34,7 +34,7 @@ export class ResetPasswordView implements OnInit {
   }
 
   markTouched(field: string): void {
-    this.touchedFields.update(fields => new Set(fields).add(field));
+    this.touchedFields.update((fields) => new Set(fields).add(field));
   }
 
   isTouched(field: string): boolean {
@@ -63,20 +63,22 @@ export class ResetPasswordView implements OnInit {
   }
 
   get formValid(): boolean {
-    return this.otpError === null
-      && this.passwordError === null
-      && this.confirmPasswordError === null
-      && this.otp().length > 0
-      && this.newPassword().length > 0
-      && this.confirmPassword().length > 0;
+    return (
+      this.otpError === null &&
+      this.passwordError === null &&
+      this.confirmPasswordError === null &&
+      this.otp().length > 0 &&
+      this.newPassword().length > 0 &&
+      this.confirmPassword().length > 0
+    );
   }
 
   togglePassword(): void {
-    this.showPassword.update(v => !v);
+    this.showPassword.update((v) => !v);
   }
 
   toggleConfirmPassword(): void {
-    this.showConfirmPassword.update(v => !v);
+    this.showConfirmPassword.update((v) => !v);
   }
 
   parseError(message: string): { text: string; type: 'expired' | 'used' | 'invalid' } {

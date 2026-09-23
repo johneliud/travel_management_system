@@ -10,7 +10,15 @@ import { ChangePasswordView } from './change-password-view';
 
 @Component({
   selector: 'app-auth-modal-shell',
-  imports: [LucideX, LoginView, RegisterView, VerifyEmailView, ForgotPasswordView, ResetPasswordView, ChangePasswordView],
+  imports: [
+    LucideX,
+    LoginView,
+    RegisterView,
+    VerifyEmailView,
+    ForgotPasswordView,
+    ResetPasswordView,
+    ChangePasswordView,
+  ],
   templateUrl: './auth-modal-shell.html',
 })
 export class AuthModalShell {

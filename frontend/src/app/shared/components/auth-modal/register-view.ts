@@ -25,7 +25,7 @@ export class RegisterView {
   readonly touchedFields = signal<Set<string>>(new Set());
 
   markTouched(field: string): void {
-    this.touchedFields.update(fields => new Set(fields).add(field));
+    this.touchedFields.update((fields) => new Set(fields).add(field));
   }
 
   isTouched(field: string): boolean {
@@ -70,16 +70,18 @@ export class RegisterView {
   }
 
   get formValid(): boolean {
-    return this.firstNameError === null
-      && this.lastNameError === null
-      && this.emailError === null
-      && this.passwordError === null
-      && this.confirmPasswordError === null
-      && this.firstName().length > 0
-      && this.lastName().length > 0
-      && this.email().length > 0
-      && this.password().length > 0
-      && this.confirmPassword().length > 0;
+    return (
+      this.firstNameError === null &&
+      this.lastNameError === null &&
+      this.emailError === null &&
+      this.passwordError === null &&
+      this.confirmPasswordError === null &&
+      this.firstName().length > 0 &&
+      this.lastName().length > 0 &&
+      this.email().length > 0 &&
+      this.password().length > 0 &&
+      this.confirmPassword().length > 0
+    );
   }
 
   switchView(view: 'login'): void {
@@ -88,11 +90,11 @@ export class RegisterView {
   }
 
   togglePassword(): void {
-    this.showPassword.update(v => !v);
+    this.showPassword.update((v) => !v);
   }
 
   toggleConfirmPassword(): void {
-    this.showConfirmPassword.update(v => !v);
+    this.showConfirmPassword.update((v) => !v);
   }
 
   async onSubmit(): Promise<void> {

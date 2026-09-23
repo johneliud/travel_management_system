@@ -4,11 +4,30 @@ import { UpperCasePipe } from '@angular/common';
 import { SessionService } from '../../../core/auth/session.service';
 import { AuthModalService } from '../../../core/auth/auth-modal.service';
 import { NAV_ITEMS } from '../../../core/nav.config';
-import { LucideMenu, LucideX, LucideChevronDown, LucideMail, LucideUser, LucideKeyRound, LucideLogOut } from '@lucide/angular';
+import {
+  LucideMenu,
+  LucideX,
+  LucideChevronDown,
+  LucideMail,
+  LucideUser,
+  LucideKeyRound,
+  LucideLogOut,
+} from '@lucide/angular';
 
 @Component({
   selector: 'app-header',
-  imports: [RouterLink, RouterLinkActive, UpperCasePipe, LucideMenu, LucideX, LucideChevronDown, LucideMail, LucideUser, LucideKeyRound, LucideLogOut],
+  imports: [
+    RouterLink,
+    RouterLinkActive,
+    UpperCasePipe,
+    LucideMenu,
+    LucideX,
+    LucideChevronDown,
+    LucideMail,
+    LucideUser,
+    LucideKeyRound,
+    LucideLogOut,
+  ],
   templateUrl: './header.html',
   host: {
     '(document:click)': 'onDocumentClick($event)',

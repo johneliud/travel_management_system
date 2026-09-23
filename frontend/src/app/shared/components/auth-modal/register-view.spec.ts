@@ -16,7 +16,11 @@ function jsonResponse(body: unknown, init?: ResponseInit): Response {
 describe('RegisterView', () => {
   let component: RegisterView;
   let fixture: ComponentFixture<RegisterView>;
-  let authModalSpy: { switchView: ReturnType<typeof vi.fn>; setUserEmail: ReturnType<typeof vi.fn>; setPendingOtp: ReturnType<typeof vi.fn> };
+  let authModalSpy: {
+    switchView: ReturnType<typeof vi.fn>;
+    setUserEmail: ReturnType<typeof vi.fn>;
+    setPendingOtp: ReturnType<typeof vi.fn>;
+  };
   let sessionSpy: { setSession: ReturnType<typeof vi.fn> };
   let fetchSpy: ReturnType<typeof vi.fn>;
 
@@ -37,7 +41,10 @@ describe('RegisterView', () => {
       providers: [
         { provide: AuthModalService, useValue: authModalSpy },
         { provide: SessionService, useValue: sessionSpy },
-        { provide: ENVIRONMENT, useValue: { production: false, apiBaseUrl: 'http://localhost:8080' } },
+        {
+          provide: ENVIRONMENT,
+          useValue: { production: false, apiBaseUrl: 'http://localhost:8080' },
+        },
       ],
     }).compileComponents();
 
@@ -100,10 +107,7 @@ describe('RegisterView', () => {
 
     it('should not store pending OTP when response has no OTP', async () => {
       fetchSpy.mockResolvedValueOnce(
-        jsonResponse(
-          { id: 1, email: 'john@example.com' },
-          { status: 201 },
-        ),
+        jsonResponse({ id: 1, email: 'john@example.com' }, { status: 201 }),
       );
       fillValidForm();
 
@@ -131,10 +135,7 @@ describe('RegisterView', () => {
 
     it('should show generic error for non-duplicate 409', async () => {
       fetchSpy.mockResolvedValueOnce(
-        jsonResponse(
-          { code: 'SOME_OTHER_CONFLICT', message: 'something else' },
-          { status: 409 },
-        ),
+        jsonResponse({ code: 'SOME_OTHER_CONFLICT', message: 'something else' }, { status: 409 }),
       );
       fillValidForm();
 
@@ -147,10 +148,7 @@ describe('RegisterView', () => {
   describe('other errors', () => {
     it('should show generic error for 400 validation', async () => {
       fetchSpy.mockResolvedValueOnce(
-        jsonResponse(
-          { code: 'VALIDATION_ERROR', message: 'invalid data' },
-          { status: 400 },
-        ),
+        jsonResponse({ code: 'VALIDATION_ERROR', message: 'invalid data' }, { status: 400 }),
       );
       fillValidForm();
 

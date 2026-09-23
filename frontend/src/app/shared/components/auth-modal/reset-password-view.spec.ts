@@ -35,7 +35,10 @@ describe('ResetPasswordView', () => {
       imports: [ResetPasswordView],
       providers: [
         { provide: AuthModalService, useValue: authModalSpy },
-        { provide: ENVIRONMENT, useValue: { production: true, apiBaseUrl: 'http://localhost:8080' } },
+        {
+          provide: ENVIRONMENT,
+          useValue: { production: true, apiBaseUrl: 'http://localhost:8080' },
+        },
       ],
     }).compileComponents();
 
@@ -65,13 +68,16 @@ describe('ResetPasswordView', () => {
 
       await component.onSubmit();
 
-      expect(fetchSpy).toHaveBeenCalledWith('/api/auth/reset-password', expect.objectContaining({
-        body: JSON.stringify({
-          email: 'test@example.com',
-          otp: '123456',
-          newPassword: 'NewPass!123',
+      expect(fetchSpy).toHaveBeenCalledWith(
+        '/api/auth/reset-password',
+        expect.objectContaining({
+          body: JSON.stringify({
+            email: 'test@example.com',
+            otp: '123456',
+            newPassword: 'NewPass!123',
+          }),
         }),
-      }));
+      );
       expect(authModalSpy.switchView).toHaveBeenCalledWith('login');
     });
   });

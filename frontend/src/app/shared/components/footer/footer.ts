@@ -10,7 +10,10 @@ import { RouterLink } from '@angular/router';
         <div class="flex flex-row items-start justify-between gap-8">
           <!-- Brand -->
           <div class="lg:max-w-xs">
-            <a routerLink="/" class="text-xl font-semibold text-(--color-text) font-(family-name:--font-heading)">
+            <a
+              routerLink="/"
+              class="text-xl font-semibold text-(--color-text) font-(family-name:--font-heading)"
+            >
               TMS
             </a>
             <p class="mt-2 text-sm text-(--color-text-muted)">
@@ -25,7 +28,10 @@ import { RouterLink } from '@angular/router';
               <h4 class="text-sm font-semibold text-(--color-text) mb-3">Navigation</h4>
               <ul class="space-y-2">
                 <li>
-                  <a routerLink="/travels" class="text-sm text-(--color-text-muted) hover:text-(--color-primary) transition-colors">
+                  <a
+                    routerLink="/travels"
+                    class="text-sm text-(--color-text-muted) hover:text-(--color-primary) transition-colors"
+                  >
                     Browse Travels
                   </a>
                 </li>
@@ -37,12 +43,18 @@ import { RouterLink } from '@angular/router';
               <h4 class="text-sm font-semibold text-(--color-text) mb-3">Legal</h4>
               <ul class="space-y-2">
                 <li>
-                  <a routerLink="/privacy" class="text-sm text-(--color-text-muted) hover:text-(--color-primary) transition-colors">
+                  <a
+                    routerLink="/privacy"
+                    class="text-sm text-(--color-text-muted) hover:text-(--color-primary) transition-colors"
+                  >
                     Privacy Policy
                   </a>
                 </li>
                 <li>
-                  <a routerLink="/terms" class="text-sm text-(--color-text-muted) hover:text-(--color-primary) transition-colors">
+                  <a
+                    routerLink="/terms"
+                    class="text-sm text-(--color-text-muted) hover:text-(--color-primary) transition-colors"
+                  >
                     Terms of Service
                   </a>
                 </li>
@@ -52,7 +64,9 @@ import { RouterLink } from '@angular/router';
         </div>
 
         <!-- Bottom bar -->
-        <div class="mt-8 pt-6 border-t border-(--color-border) flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div
+          class="mt-8 pt-6 border-t border-(--color-border) flex flex-col sm:flex-row items-center justify-between gap-4"
+        >
           <p class="text-xs text-(--color-text-muted)">
             &copy; {{ currentYear }} Travel Management System
           </p>

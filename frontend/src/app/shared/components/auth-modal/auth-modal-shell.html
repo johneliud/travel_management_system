@@ -8,19 +8,25 @@
 
     <!-- Middle: Title & Subtitle -->
     <div class="my-auto">
-      <h3 class="text-2xl font-semibold font-(family-name:--font-heading) mb-3">{{ viewTitle() }}</h3>
+      <h3 class="text-2xl font-semibold font-(family-name:--font-heading) mb-3">
+        {{ viewTitle() }}
+      </h3>
       <p class="text-sm text-(--color-text-inverse)/80 leading-relaxed">{{ viewSubtitle() }}</p>
     </div>
 
     <!-- Bottom: Copyright -->
-    <p class="mt-auto text-xs text-(--color-text-inverse)/50">&copy; {{ currentYear }} Travel Management System</p>
+    <p class="mt-auto text-xs text-(--color-text-inverse)/50">
+      &copy; {{ currentYear }} Travel Management System
+    </p>
   </div>
 
   <!-- Right panel: form content -->
   <div class="w-full md:w-1/2 flex flex-col">
     <!-- Header bar -->
     <div class="flex items-center justify-between px-6 py-4 border-b border-(--color-border)">
-      <h2 class="text-lg font-semibold text-(--color-text) font-(family-name:--font-heading) md:hidden">
+      <h2
+        class="text-lg font-semibold text-(--color-text) font-(family-name:--font-heading) md:hidden"
+      >
         {{ viewTitle() }}
       </h2>
       <div class="hidden md:block"></div>
@@ -36,33 +42,67 @@
     <!-- View content -->
     <div class="flex-1 px-6 py-5 overflow-y-auto">
       @switch (currentView()) {
-        @case ('login') { <app-login-view /> }
-        @case ('register') { <app-register-view /> }
-        @case ('verify-email') { <app-verify-email-view /> }
-        @case ('forgot-password') { <app-forgot-password-view /> }
-        @case ('reset-password') { <app-reset-password-view /> }
-        @case ('change-password') { <app-change-password-view /> }
+        @case ('login') {
+          <app-login-view />
+        }
+        @case ('register') {
+          <app-register-view />
+        }
+        @case ('verify-email') {
+          <app-verify-email-view />
+        }
+        @case ('forgot-password') {
+          <app-forgot-password-view />
+        }
+        @case ('reset-password') {
+          <app-reset-password-view />
+        }
+        @case ('change-password') {
+          <app-change-password-view />
+        }
       }
     </div>
 
     <!-- Bottom: Quick links -->
-    <div class="px-6 py-4 border-t border-(--color-border) text-center text-sm text-(--color-text-muted)">
+    <div
+      class="px-6 py-4 border-t border-(--color-border) text-center text-sm text-(--color-text-muted)"
+    >
       @switch (currentView()) {
         @case ('login') {
           Don't have an account?
-          <button (click)="switchView('register')" class="text-(--color-primary) hover:text-(--color-primary-hover) font-medium">Register</button>
+          <button
+            (click)="switchView('register')"
+            class="text-(--color-primary) hover:text-(--color-primary-hover) font-medium"
+          >
+            Register
+          </button>
         }
         @case ('register') {
           Already have an account?
-          <button (click)="switchView('login')" class="text-(--color-primary) hover:text-(--color-primary-hover) font-medium">Log In</button>
+          <button
+            (click)="switchView('login')"
+            class="text-(--color-primary) hover:text-(--color-primary-hover) font-medium"
+          >
+            Log In
+          </button>
         }
         @case ('forgot-password') {
           Remember your password?
-          <button (click)="switchView('login')" class="text-(--color-primary) hover:text-(--color-primary-hover) font-medium">Log In</button>
+          <button
+            (click)="switchView('login')"
+            class="text-(--color-primary) hover:text-(--color-primary-hover) font-medium"
+          >
+            Log In
+          </button>
         }
         @case ('reset-password') {
           Remember your password?
-          <button (click)="switchView('login')" class="text-(--color-primary) hover:text-(--color-primary-hover) font-medium">Log In</button>
+          <button
+            (click)="switchView('login')"
+            class="text-(--color-primary) hover:text-(--color-primary-hover) font-medium"
+          >
+            Log In
+          </button>
         }
       }
     </div>

@@ -35,7 +35,10 @@ describe('ForgotPasswordView', () => {
       imports: [ForgotPasswordView],
       providers: [
         { provide: AuthModalService, useValue: authModalSpy },
-        { provide: ENVIRONMENT, useValue: { production: true, apiBaseUrl: 'http://localhost:8080' } },
+        {
+          provide: ENVIRONMENT,
+          useValue: { production: true, apiBaseUrl: 'http://localhost:8080' },
+        },
       ],
     }).compileComponents();
 
@@ -55,7 +58,10 @@ describe('ForgotPasswordView', () => {
   describe('generic messaging', () => {
     it('should switch to reset-password view after successful request', async () => {
       fetchSpy.mockResolvedValueOnce(
-        jsonResponse({ message: 'If this email is registered, a reset code has been sent.', verificationOtp: null }),
+        jsonResponse({
+          message: 'If this email is registered, a reset code has been sent.',
+          verificationOtp: null,
+        }),
       );
       component.email.set('user@example.com');
 

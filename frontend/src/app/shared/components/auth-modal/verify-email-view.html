@@ -1,11 +1,15 @@
 @if (error()) {
-  <div class="mb-4 px-4 py-3 rounded-(--radius-md) bg-(--color-error-light) text-(--color-error) text-sm">
+  <div
+    class="mb-4 px-4 py-3 rounded-(--radius-md) bg-(--color-error-light) text-(--color-error) text-sm"
+  >
     {{ error() }}
   </div>
 }
 
 @if (success()) {
-  <div class="mb-4 px-4 py-3 rounded-(--radius-md) bg-(--color-success-light) text-(--color-success) text-sm">
+  <div
+    class="mb-4 px-4 py-3 rounded-(--radius-md) bg-(--color-success-light) text-(--color-success) text-sm"
+  >
     {{ success() }}
   </div>
 }
@@ -13,7 +17,8 @@
 <form (submit)="$event.preventDefault(); onSubmit()" class="space-y-4">
   @if (userEmail()) {
     <p class="text-sm text-(--color-text-secondary)">
-      Enter the 6-digit code sent to <strong>{{ userEmail() }}</strong>.
+      Enter the 6-digit code sent to <strong>{{ userEmail() }}</strong
+      >.
     </p>
   } @else {
     <p class="text-sm text-(--color-text-secondary)">
@@ -22,7 +27,9 @@
   }
 
   <div>
-    <label for="otp-0" class="block text-sm font-medium text-(--color-text-secondary) mb-2">Verification Code</label>
+    <label for="otp-0" class="block text-sm font-medium text-(--color-text-secondary) mb-2"
+      >Verification Code</label
+    >
     <div
       class="flex gap-2 justify-center"
       (paste)="onPaste($event)"
@@ -40,8 +47,7 @@
           (input)="onInput($index, $event)"
           (keydown)="onKeyDown($index, $event)"
           [attr.aria-label]="'Digit ' + ($index + 1)"
-          class="w-12 h-14 text-center text-xl font-semibold border rounded-(--radius-md) outline-none transition-colors
-            border-(--color-border) text-(--color-text) bg-(--color-surface)"
+          class="w-12 h-14 text-center text-xl font-semibold border rounded-(--radius-md) outline-none transition-colors border-(--color-border) text-(--color-text) bg-(--color-surface)"
           autocomplete="one-time-code"
         />
       }
@@ -61,9 +67,7 @@
 
   <div class="text-center">
     @if (cooldown() > 0) {
-      <span class="text-sm text-(--color-text-muted)">
-        Resend code in {{ cooldown() }}s
-      </span>
+      <span class="text-sm text-(--color-text-muted)"> Resend code in {{ cooldown() }}s </span>
     } @else {
       <button
         type="button"

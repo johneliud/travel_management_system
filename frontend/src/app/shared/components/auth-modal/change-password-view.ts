@@ -27,7 +27,7 @@ export class ChangePasswordView {
   readonly touchedFields = signal<Set<string>>(new Set());
 
   markTouched(field: string): void {
-    this.touchedFields.update(fields => new Set(fields).add(field));
+    this.touchedFields.update((fields) => new Set(fields).add(field));
   }
 
   isTouched(field: string): boolean {
@@ -63,12 +63,14 @@ export class ChangePasswordView {
   }
 
   get formValid(): boolean {
-    return this.currentPasswordError === null
-      && this.newPasswordError === null
-      && this.confirmPasswordError === null
-      && this.currentPassword().length > 0
-      && this.newPassword().length > 0
-      && this.confirmPassword().length > 0;
+    return (
+      this.currentPasswordError === null &&
+      this.newPasswordError === null &&
+      this.confirmPasswordError === null &&
+      this.currentPassword().length > 0 &&
+      this.newPassword().length > 0 &&
+      this.confirmPassword().length > 0
+    );
   }
 
   get submitValid(): boolean {
@@ -80,15 +82,15 @@ export class ChangePasswordView {
   }
 
   toggleCurrentPassword(): void {
-    this.showCurrentPassword.update(v => !v);
+    this.showCurrentPassword.update((v) => !v);
   }
 
   toggleNewPassword(): void {
-    this.showNewPassword.update(v => !v);
+    this.showNewPassword.update((v) => !v);
   }
 
   toggleConfirmPassword(): void {
-    this.showConfirmPassword.update(v => !v);
+    this.showConfirmPassword.update((v) => !v);
   }
 
   async requestOtp(): Promise<void> {

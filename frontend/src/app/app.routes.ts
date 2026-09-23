@@ -8,12 +8,10 @@ export const routes: Routes = [
   // },
   {
     path: 'terms',
-    loadComponent: () =>
-      import('./pages/terms/terms').then(m => m.TermsPage),
+    loadComponent: () => import('./pages/terms/terms').then((m) => m.TermsPage),
   },
   {
     path: 'privacy',
-    loadComponent: () =>
-      import('./pages/privacy/privacy').then(m => m.PrivacyPage),
+    loadComponent: () => import('./pages/privacy/privacy').then((m) => m.PrivacyPage),
   },
 ];

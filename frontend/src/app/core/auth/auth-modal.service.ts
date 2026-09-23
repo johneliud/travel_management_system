@@ -18,27 +18,42 @@ export class AuthModalService {
 
   readonly viewTitle = computed(() => {
     switch (this._currentView()) {
-      case 'login': return 'Welcome back';
-      case 'register': return 'Create your account';
-      case 'verify-email': return 'Verify your email';
-      case 'forgot-password': return 'Reset your password';
-      case 'reset-password': return 'Set new password';
-      case 'change-password': return 'Change password';
+      case 'login':
+        return 'Welcome back';
+      case 'register':
+        return 'Create your account';
+      case 'verify-email':
+        return 'Verify your email';
+      case 'forgot-password':
+        return 'Reset your password';
+      case 'reset-password':
+        return 'Set new password';
+      case 'change-password':
+        return 'Change password';
     }
   });
 
   readonly viewSubtitle = computed(() => {
     switch (this._currentView()) {
-      case 'login': return 'Sign in to access your travel dashboard';
-      case 'register': return 'Start planning your next adventure';
-      case 'verify-email': return 'Enter the 6-digit code sent to your email';
-      case 'forgot-password': return "We'll send you a code to reset your password";
-      case 'reset-password': return 'Choose a strong new password';
-      case 'change-password': return 'Update your account password';
+      case 'login':
+        return 'Sign in to access your travel dashboard';
+      case 'register':
+        return 'Start planning your next adventure';
+      case 'verify-email':
+        return 'Enter the 6-digit code sent to your email';
+      case 'forgot-password':
+        return "We'll send you a code to reset your password";
+      case 'reset-password':
+        return 'Choose a strong new password';
+      case 'change-password':
+        return 'Update your account password';
     }
   });
 
-  open(view: AuthModalView = 'login', options?: { redirectUrl?: string; dismissible?: boolean }): void {
+  open(
+    view: AuthModalView = 'login',
+    options?: { redirectUrl?: string; dismissible?: boolean },
+  ): void {
     this._currentView.set(view);
     if (options?.redirectUrl) {
       this._redirectUrl = options.redirectUrl;
@@ -80,12 +95,18 @@ export class AuthModalService {
 
   private getAriaLabel(view: AuthModalView): string {
     switch (view) {
-      case 'login': return 'Log in';
-      case 'register': return 'Register';
-      case 'verify-email': return 'Verify email';
-      case 'forgot-password': return 'Forgot password';
-      case 'reset-password': return 'Reset password';
-      case 'change-password': return 'Change password';
+      case 'login':
+        return 'Log in';
+      case 'register':
+        return 'Register';
+      case 'verify-email':
+        return 'Verify email';
+      case 'forgot-password':
+        return 'Forgot password';
+      case 'reset-password':
+        return 'Reset password';
+      case 'change-password':
+        return 'Change password';
     }
   }
 }
