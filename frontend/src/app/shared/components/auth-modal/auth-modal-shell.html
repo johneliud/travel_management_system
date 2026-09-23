@@ -1,0 +1,70 @@
+<div class="flex min-h-120">
+  <!-- Left panel: branding (hidden on mobile) -->
+  <div class="hidden md:flex flex-col w-1/2 bg-(--color-primary) text-(--color-text-inverse) p-10">
+    <!-- Top: Logo -->
+    <div class="flex items-center gap-2 mb-auto">
+      <span class="text-xl font-bold font-(family-name:--font-heading)">TMS</span>
+    </div>
+
+    <!-- Middle: Title & Subtitle -->
+    <div class="my-auto">
+      <h3 class="text-2xl font-semibold font-(family-name:--font-heading) mb-3">{{ viewTitle() }}</h3>
+      <p class="text-sm text-(--color-text-inverse)/80 leading-relaxed">{{ viewSubtitle() }}</p>
+    </div>
+
+    <!-- Bottom: Copyright -->
+    <p class="mt-auto text-xs text-(--color-text-inverse)/50">&copy; {{ currentYear }} Travel Management System</p>
+  </div>
+
+  <!-- Right panel: form content -->
+  <div class="w-full md:w-1/2 flex flex-col">
+    <!-- Header bar -->
+    <div class="flex items-center justify-between px-6 py-4 border-b border-(--color-border)">
+      <h2 class="text-lg font-semibold text-(--color-text) font-(family-name:--font-heading) md:hidden">
+        {{ viewTitle() }}
+      </h2>
+      <div class="hidden md:block"></div>
+      <button
+        (click)="close()"
+        class="p-1 rounded-(--radius-md) text-(--color-text-muted) hover:bg-(--color-surface-sunken) hover:text-(--color-text)"
+        aria-label="Close dialog"
+      >
+        <svg lucideX [size]="20" />
+      </button>
+    </div>
+
+    <!-- View content -->
+    <div class="flex-1 px-6 py-5 overflow-y-auto">
+      @switch (currentView()) {
+        @case ('login') { <app-login-view /> }
+        @case ('register') { <app-register-view /> }
+        @case ('verify-email') { <app-verify-email-view /> }
+        @case ('forgot-password') { <app-forgot-password-view /> }
+        @case ('reset-password') { <app-reset-password-view /> }
+        @case ('change-password') { <app-change-password-view /> }
+      }
+    </div>
+
+    <!-- Bottom: Quick links -->
+    <div class="px-6 py-4 border-t border-(--color-border) text-center text-sm text-(--color-text-muted)">
+      @switch (currentView()) {
+        @case ('login') {
+          Don't have an account?
+          <button (click)="switchView('register')" class="text-(--color-primary) hover:text-(--color-primary-hover) font-medium">Register</button>
+        }
+        @case ('register') {
+          Already have an account?
+          <button (click)="switchView('login')" class="text-(--color-primary) hover:text-(--color-primary-hover) font-medium">Log In</button>
+        }
+        @case ('forgot-password') {
+          Remember your password?
+          <button (click)="switchView('login')" class="text-(--color-primary) hover:text-(--color-primary-hover) font-medium">Log In</button>
+        }
+        @case ('reset-password') {
+          Remember your password?
+          <button (click)="switchView('login')" class="text-(--color-primary) hover:text-(--color-primary-hover) font-medium">Log In</button>
+        }
+      }
+    </div>
+  </div>
+</div>
