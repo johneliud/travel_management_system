@@ -8,7 +8,7 @@
       (keydown.enter)="openVerifyEmail()"
       (keydown.space)="openVerifyEmail()"
     >
-      <app-icon name="mail" [size]="16" />
+                  <svg lucideMail [size]="16" />
       <span>Your email is not verified. <strong>Click here to verify</strong>.</span>
     </div>
   }
@@ -43,7 +43,7 @@
               {{ user()?.email?.charAt(0) | uppercase }}
             </span>
             <span class="max-w-[120px] truncate">{{ user()?.email }}</span>
-            <app-icon name="chevron-down" [size]="16" [class]="userMenuOpen() ? 'transition-transform rotate-180' : 'transition-transform'" />
+            <svg lucideChevronDown [size]="16" [class]="userMenuOpen() ? 'transition-transform rotate-180' : 'transition-transform'" />
           </button>
 
           @if (userMenuOpen()) {
@@ -53,22 +53,22 @@
                 <p class="text-xs text-(--color-text-muted)">{{ roles().join(', ') }}</p>
               </div>
               <a routerLink="/profile" class="flex items-center gap-2 px-4 py-2 text-sm text-(--color-text-secondary) hover:bg-(--color-surface-sunken)" (click)="closeUserMenu()">
-                <app-icon name="user" [size]="16" />
+                <svg lucideUser [size]="16" />
                 Profile
               </a>
               <a routerLink="/change-password" class="flex items-center gap-2 px-4 py-2 text-sm text-(--color-text-secondary) hover:bg-(--color-surface-sunken)" (click)="closeUserMenu()">
-                <app-icon name="key-round" [size]="16" />
+                <svg lucideKeyRound [size]="16" />
                 Change Password
               </a>
               @if (!emailVerified()) {
                 <button (click)="openVerifyEmail()" class="flex items-center gap-2 px-4 py-2 text-sm text-(--color-warning) hover:bg-(--color-surface-sunken) w-full text-left">
-                  <app-icon name="mail" [size]="16" />
+      <svg lucideMail [size]="16" />
                   Verify Email
                 </button>
               }
               <hr class="my-1 border-(--color-border)" />
               <button (click)="logout()" class="flex items-center gap-2 px-4 py-2 text-sm text-(--color-error) hover:bg-(--color-error-light) w-full text-left">
-                <app-icon name="log-out" [size]="16" />
+                <svg lucideLogOut [size]="16" />
                 Log Out
               </button>
             </div>
@@ -99,9 +99,9 @@
         aria-label="Toggle navigation menu"
       >
         @if (mobileMenuOpen()) {
-          <app-icon name="x" [size]="24" />
+          <svg lucideX [size]="24" />
         } @else {
-          <app-icon name="menu" [size]="24" />
+          <svg lucideMenu [size]="24" />
         }
       </button>
     </div>

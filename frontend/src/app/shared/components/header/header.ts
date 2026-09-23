@@ -2,14 +2,13 @@ import { Component, signal, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { UpperCasePipe } from '@angular/common';
 import { SessionService } from '../../../core/auth/session.service';
-import { ModalService } from '../../../core/modal/modal.service';
+import { AuthModalService } from '../../../core/auth/auth-modal.service';
 import { NAV_ITEMS } from '../../../core/nav.config';
-import { IconComponent } from '../icon/icon';
-import { AuthModal } from './auth-modal';
+import { LucideMenu, LucideX, LucideChevronDown, LucideMail, LucideUser, LucideKeyRound, LucideLogOut } from '@lucide/angular';
 
 @Component({
   selector: 'app-header',
-  imports: [RouterLink, RouterLinkActive, UpperCasePipe, IconComponent],
+  imports: [RouterLink, RouterLinkActive, UpperCasePipe, LucideMenu, LucideX, LucideChevronDown, LucideMail, LucideUser, LucideKeyRound, LucideLogOut],
   templateUrl: './header.html',
   host: {
     '(document:click)': 'onDocumentClick($event)',
@@ -18,7 +17,7 @@ import { AuthModal } from './auth-modal';
 })
 export class Header {
   private readonly session = inject(SessionService);
-  private readonly modalService = inject(ModalService);
+  private readonly authModal = inject(AuthModalService);
 
   readonly isLoggedIn = this.session.isLoggedIn;
   readonly emailVerified = this.session.emailVerified;
@@ -50,17 +49,17 @@ export class Header {
   }
 
   openLogin(): void {
-    this.modalService.open({ component: AuthModal, data: { view: 'login' }, ariaLabel: 'Log in' });
+    this.authModal.open('login');
     this.mobileMenuOpen.set(false);
   }
 
   openRegister(): void {
-    this.modalService.open({ component: AuthModal, data: { view: 'register' }, ariaLabel: 'Register' });
+    this.authModal.open('register');
     this.mobileMenuOpen.set(false);
   }
 
   openVerifyEmail(): void {
-    this.modalService.open({ component: AuthModal, data: { view: 'verify-email' }, ariaLabel: 'Verify email' });
+    this.authModal.open('verify-email');
     this.closeUserMenu();
     this.mobileMenuOpen.set(false);
   }
