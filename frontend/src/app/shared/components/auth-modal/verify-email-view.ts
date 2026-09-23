@@ -1,7 +1,9 @@
 import { Component, signal, inject } from '@angular/core';
+import type { OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthModalService } from '../../../core/auth/auth-modal.service';
 import { SessionService } from '../../../core/auth/session.service';
+import { environment } from '../../../../environment/environment';
 import { LucideLoaderCircle } from '@lucide/angular';
 
 @Component({
@@ -9,7 +11,7 @@ import { LucideLoaderCircle } from '@lucide/angular';
   imports: [FormsModule, LucideLoaderCircle],
   templateUrl: './verify-email-view.html',
 })
-export class VerifyEmailView {
+export class VerifyEmailView implements OnInit {
   private readonly authModal = inject(AuthModalService);
   private readonly session = inject(SessionService);
 
@@ -19,6 +21,15 @@ export class VerifyEmailView {
   readonly success = signal('');
 
   readonly userEmail = this.authModal.userEmail;
+
+  ngOnInit(): void {
+    if (!environment.production) {
+      const pendingOtp = this.authModal.consumePendingOtp();
+      if (pendingOtp) {
+        this.otp.set(pendingOtp);
+      }
+    }
+  }
 
   async onSubmit(): Promise<void> {
     this.loading.set(true);

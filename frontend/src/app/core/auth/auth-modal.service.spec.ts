@@ -189,4 +189,21 @@ describe('AuthModalService', () => {
       expect(service.currentView()).toBe('change-password');
     });
   });
+
+  describe('pendingOtp', () => {
+    it('should return null when no OTP is pending', () => {
+      expect(service.consumePendingOtp()).toBeNull();
+    });
+
+    it('should store and consume pending OTP', () => {
+      service.setPendingOtp('123456');
+      expect(service.consumePendingOtp()).toBe('123456');
+    });
+
+    it('should clear pending OTP after consuming', () => {
+      service.setPendingOtp('123456');
+      service.consumePendingOtp();
+      expect(service.consumePendingOtp()).toBeNull();
+    });
+  });
 });

@@ -1,6 +1,7 @@
 import { Component, signal, inject } from '@angular/core';
 import { AuthModalService } from '../../../core/auth/auth-modal.service';
 import { SessionService } from '../../../core/auth/session.service';
+import { environment } from '../../../../environment/environment';
 import { LucideEye, LucideEyeOff, LucideLoaderCircle } from '@lucide/angular';
 
 @Component({
@@ -114,7 +115,11 @@ export class RegisterView {
 
       if (!response.ok) {
         const body = await response.json().catch(() => ({}));
-        this.error.set(body.message || 'Registration failed');
+        if (response.status === 409 && body.code === 'EMAIL_ALREADY_IN_USE') {
+          this.error.set('An account with this email already exists');
+        } else {
+          this.error.set(body.message || 'Registration failed');
+        }
         return;
       }
 
@@ -126,6 +131,11 @@ export class RegisterView {
         roles: ['TRAVELER'],
       });
       this.authModal.setUserEmail(data.email);
+
+      if (!environment.production && data.verificationOtp) {
+        this.authModal.setPendingOtp(data.verificationOtp);
+      }
+
       this.authModal.switchView('verify-email');
     } catch {
       this.error.set('Network error. Please try again.');

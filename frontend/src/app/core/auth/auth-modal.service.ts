@@ -10,6 +10,7 @@ export class AuthModalService {
   private readonly _currentView = signal<AuthModalView>('login');
   private readonly _userEmail = signal('');
   private _redirectUrl: string | null = null;
+  private _pendingOtp: string | null = null;
 
   readonly currentView = this._currentView.asReadonly();
   readonly userEmail = this._userEmail.asReadonly();
@@ -53,6 +54,16 @@ export class AuthModalService {
     const url = this._redirectUrl;
     this._redirectUrl = null;
     return url;
+  }
+
+  setPendingOtp(otp: string): void {
+    this._pendingOtp = otp;
+  }
+
+  consumePendingOtp(): string | null {
+    const otp = this._pendingOtp;
+    this._pendingOtp = null;
+    return otp;
   }
 
   switchView(view: AuthModalView): void {
