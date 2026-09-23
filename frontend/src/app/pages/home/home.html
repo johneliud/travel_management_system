@@ -44,7 +44,7 @@
 
 <!-- Logged-out marketing -->
 @if (!isLoggedIn()) {
-  <!--<section class="max-w-screen-xl mx-auto px-4 sm:px-6 py-16">
+  <section class="max-w-screen-xl mx-auto px-4 sm:px-6 py-16">
     <h2
       class="text-2xl sm:text-3xl font-bold text-(--color-text) font-(family-name:--font-heading) text-center"
     >
@@ -95,12 +95,12 @@
         </button>
       </p>
     </div>
-  </section>-->
+  </section>
 }
 
 <!-- Logged-in: Traveler -->
 @if (isLoggedIn() && hasRole('TRAVELER')) {
-  <!--<section class="max-w-screen-xl mx-auto px-4 sm:px-6 py-16">
+  <section class="max-w-screen-xl mx-auto px-4 sm:px-6 py-16">
     <h2
       class="text-2xl sm:text-3xl font-bold text-(--color-text) font-(family-name:--font-heading)"
     >
@@ -117,12 +117,12 @@
         Browse travels
       </a>
     </div>
-  </section>-->
+  </section>
 }
 
 <!-- Logged-in: Travel Manager -->
 @if (isLoggedIn() && hasRole('TRAVEL_MANAGER')) {
-  <!--<section class="max-w-screen-xl mx-auto px-4 sm:px-6 py-16">
+  <section class="max-w-screen-xl mx-auto px-4 sm:px-6 py-16">
     <h2
       class="text-2xl sm:text-3xl font-bold text-(--color-text) font-(family-name:--font-heading)"
     >
@@ -143,12 +143,12 @@
         Browse all
       </a>
     </div>
-  </section>-->
+  </section>
 }
 
 <!-- Logged-in: Admin -->
 @if (isLoggedIn() && hasRole('ADMIN')) {
-  <!--<section class="max-w-screen-xl mx-auto px-4 sm:px-6 py-16">
+  <section class="max-w-screen-xl mx-auto px-4 sm:px-6 py-16">
     <h2
       class="text-2xl sm:text-3xl font-bold text-(--color-text) font-(family-name:--font-heading)"
     >
@@ -169,5 +169,5 @@
         Browse travels
       </a>
     </div>
-  </section>-->
+  </section>
 }

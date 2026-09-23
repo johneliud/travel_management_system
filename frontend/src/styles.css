@@ -162,7 +162,7 @@
   --z-sticky: 30;
   --z-overlay: 40;
   --z-modal: 50;
-  --z-toast: 60;
+  --z-toast: 100;
 
   --duration-fast: 100ms;
   --duration-normal: 200ms;
