@@ -50,7 +50,7 @@ class CreateTravelIntegrationTest extends IntegrationTest {
                 .header(API_VERSION_HEADER, API_VERSION)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                    {"email":"%s","password":"%s"}
+                    {"firstName":"Test","lastName":"User","email":"%s","password":"%s"}
                     """.formatted(MANAGER_EMAIL, password)))
             .andExpect(status().isCreated());
 
@@ -240,7 +240,7 @@ class CreateTravelIntegrationTest extends IntegrationTest {
                 .header(API_VERSION_HEADER, API_VERSION)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                    {"email":"%s","password":"%s"}
+                    {"firstName":"Test","lastName":"User","email":"%s","password":"%s"}
                     """.formatted(travelerEmail, travelerPassword)))
             .andExpect(status().isCreated());
 

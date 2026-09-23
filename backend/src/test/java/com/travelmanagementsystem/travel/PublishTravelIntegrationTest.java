@@ -60,7 +60,7 @@ class PublishTravelIntegrationTest extends IntegrationTest {
                 .header(API_VERSION_HEADER, API_VERSION)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                    {"email":"%s","password":"%s"}
+                    {"firstName":"Test","lastName":"User","email":"%s","password":"%s"}
                     """.formatted(managerEmail, password)))
             .andExpect(status().isCreated());
 
@@ -86,7 +86,7 @@ class PublishTravelIntegrationTest extends IntegrationTest {
                 .header(API_VERSION_HEADER, API_VERSION)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                    {"email":"%s","password":"%s"}
+                    {"firstName":"Test","lastName":"User","email":"%s","password":"%s"}
                     """.formatted(otherEmail, password)))
             .andExpect(status().isCreated());
 
@@ -111,7 +111,7 @@ class PublishTravelIntegrationTest extends IntegrationTest {
                 .header(API_VERSION_HEADER, API_VERSION)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                    {"email":"%s","password":"%s"}
+                    {"firstName":"Test","lastName":"User","email":"%s","password":"%s"}
                     """.formatted(adminEmail, password)))
             .andExpect(status().isCreated());
 
@@ -278,7 +278,7 @@ class PublishTravelIntegrationTest extends IntegrationTest {
                 .header(API_VERSION_HEADER, API_VERSION)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                    {"email":"%s","password":"%s"}
+                    {"firstName":"Test","lastName":"User","email":"%s","password":"%s"}
                     """.formatted(travelerEmail, password)))
             .andExpect(status().isCreated());
 
