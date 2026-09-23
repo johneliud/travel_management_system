@@ -1,5 +1,6 @@
 import { Component, signal, inject } from '@angular/core';
 import { AuthModalService } from '../../../core/auth/auth-modal.service';
+import { environment } from '../../../../environment/environment';
 import { LucideLoaderCircle } from '@lucide/angular';
 
 @Component({
@@ -13,7 +14,6 @@ export class ForgotPasswordView {
   readonly email = signal('');
   readonly loading = signal(false);
   readonly error = signal('');
-  readonly success = signal('');
   readonly touchedFields = signal<Set<string>>(new Set());
 
   markTouched(field: string): void {
@@ -42,7 +42,7 @@ export class ForgotPasswordView {
     this.error.set('');
 
     try {
-      const response = await fetch('/api/auth/resend-verification', {
+      const response = await fetch('/api/auth/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-API-Version': '1' },
         body: JSON.stringify({ email: this.email() }),
@@ -54,8 +54,14 @@ export class ForgotPasswordView {
         return;
       }
 
+      const data = await response.json();
       this.authModal.setUserEmail(this.email());
-      this.success.set('Reset code sent! Check your inbox.');
+
+      if (!environment.production && data.verificationOtp) {
+        this.authModal.setPendingOtp(data.verificationOtp);
+      }
+
+      this.authModal.switchView('reset-password');
     } catch {
       this.error.set('Network error. Please try again.');
     } finally {
