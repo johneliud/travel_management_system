@@ -1,11 +1,15 @@
 package com.travelmanagementsystem.identity.application;
 
+import com.travelmanagementsystem.identity.api.ForgotPasswordRequest;
+import com.travelmanagementsystem.identity.api.ForgotPasswordResponse;
 import com.travelmanagementsystem.identity.api.ResendVerificationRequest;
+import com.travelmanagementsystem.identity.api.ResetPasswordRequest;
 import com.travelmanagementsystem.identity.api.VerificationRequest;
 import com.travelmanagementsystem.identity.domain.EmailVerificationToken;
 import com.travelmanagementsystem.identity.domain.User;
 import com.travelmanagementsystem.identity.domain.VerificationTokenType;
 import com.travelmanagementsystem.identity.infrastructure.persistence.EmailVerificationTokenRepository;
+import com.travelmanagementsystem.identity.infrastructure.persistence.RefreshTokenRepository;
 import com.travelmanagementsystem.identity.infrastructure.persistence.UserRepository;
 import com.travelmanagementsystem.shared.exception.BusinessException;
 import com.travelmanagementsystem.shared.exception.InvalidVerificationTokenException;
@@ -35,6 +39,8 @@ public class EmailVerificationService {
 
     private final EmailVerificationTokenRepository tokenRepository;
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final PasswordHasher passwordHasher;
 
     @Value("${email-verification.validity-hours}")
     private long validityHours;
@@ -44,9 +50,13 @@ public class EmailVerificationService {
 
     public EmailVerificationService(
             EmailVerificationTokenRepository tokenRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            RefreshTokenRepository refreshTokenRepository,
+            PasswordHasher passwordHasher) {
         this.tokenRepository = tokenRepository;
         this.userRepository = userRepository;
+        this.refreshTokenRepository = refreshTokenRepository;
+        this.passwordHasher = passwordHasher;
     }
 
     @Transactional
@@ -144,6 +154,37 @@ public class EmailVerificationService {
         userRepository.save(user);
 
         log.debug("Email verified for user with id {}", user.getId());
+    }
+
+    @Transactional
+    public ForgotPasswordResponse forgotPassword(ForgotPasswordRequest request) {
+        Optional<User> userOpt = userRepository.findByEmail(request.email());
+
+        if (userOpt.isEmpty()) {
+            log.debug("Password reset requested for non-existent email");
+            return ForgotPasswordResponse.generic();
+        }
+
+        User user = userOpt.get();
+        String otp = generateOtp(user, VerificationTokenType.PASSWORD_RESET);
+        log.debug("Generated PASSWORD_RESET OTP {} for user with id {}", otp, user.getId());
+
+        return ForgotPasswordResponse.withOtp(otp);
+    }
+
+    @Transactional
+    public void resetPassword(ResetPasswordRequest request) {
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> InvalidVerificationTokenException.notFound());
+
+        verifyOtp(user, request.otp(), VerificationTokenType.PASSWORD_RESET);
+
+        user.setPasswordHash(passwordHasher.hash(request.newPassword()));
+        userRepository.save(user);
+
+        refreshTokenRepository.deleteByUser(user);
+
+        log.debug("Password reset for user with id {}, all refresh tokens revoked", user.getId());
     }
 
     @Transactional
