@@ -1,6 +1,7 @@
 import { Component, signal, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthModalService } from '../../../core/auth/auth-modal.service';
-import { SessionService } from '../../../core/auth/session.service';
+import { AuthService } from '../../../core/auth/auth.service';
 import { LucideEye, LucideEyeOff, LucideLoaderCircle } from '@lucide/angular';
 
 @Component({
@@ -10,7 +11,8 @@ import { LucideEye, LucideEyeOff, LucideLoaderCircle } from '@lucide/angular';
 })
 export class LoginView {
   private readonly authModal = inject(AuthModalService);
-  private readonly session = inject(SessionService);
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
 
   readonly email = signal('');
   readonly password = signal('');
@@ -64,28 +66,15 @@ export class LoginView {
     this.error.set('');
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-API-Version': '1' },
-        body: JSON.stringify({ email: this.email(), password: this.password() }),
-      });
-
-      if (!response.ok) {
-        const body = await response.json().catch(() => ({}));
-        this.error.set(body.message || 'Login failed');
-        return;
-      }
-
-      const data = await response.json();
-      this.session.setSession(data.accessToken, data.refreshToken, {
-        id: data.userId,
-        email: data.email,
-        emailVerified: data.emailVerified ?? false,
-        roles: data.roles ?? [],
-      });
+      await this.auth.login(this.email(), this.password());
       this.authModal.close();
-    } catch {
-      this.error.set('Network error. Please try again.');
+
+      const redirectUrl = this.authModal.consumeRedirectUrl();
+      if (redirectUrl) {
+        this.router.navigateByUrl(redirectUrl);
+      }
+    } catch (e) {
+      this.error.set(e instanceof Error ? e.message : 'Login failed');
     } finally {
       this.loading.set(false);
     }

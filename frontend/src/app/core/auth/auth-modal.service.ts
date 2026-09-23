@@ -9,9 +9,11 @@ export class AuthModalService {
 
   private readonly _currentView = signal<AuthModalView>('login');
   private readonly _userEmail = signal('');
+  private _redirectUrl: string | null = null;
 
   readonly currentView = this._currentView.asReadonly();
   readonly userEmail = this._userEmail.asReadonly();
+  readonly redirectUrl = () => this._redirectUrl;
 
   readonly viewTitle = computed(() => {
     switch (this._currentView()) {
@@ -35,13 +37,22 @@ export class AuthModalService {
     }
   });
 
-  open(view: AuthModalView = 'login'): void {
+  open(view: AuthModalView = 'login', redirectUrl?: string): void {
     this._currentView.set(view);
+    if (redirectUrl) {
+      this._redirectUrl = redirectUrl;
+    }
     this.modalService.open({
       component: AuthModalShell,
       ariaLabel: this.getAriaLabel(view),
       dismissible: false,
     });
+  }
+
+  consumeRedirectUrl(): string | null {
+    const url = this._redirectUrl;
+    this._redirectUrl = null;
+    return url;
   }
 
   switchView(view: AuthModalView): void {
