@@ -14,6 +14,6 @@ export const authGuard: CanActivateFn = (route) => {
   }
 
   const returnUrl = route.url.map(segment => segment.path).join('/') || '/';
-  authModal.open('login', returnUrl);
+  authModal.open('login', { redirectUrl: returnUrl, dismissible: true });
   return router.createUrlTree(['/']);
 };

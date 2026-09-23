@@ -38,15 +38,15 @@ export class AuthModalService {
     }
   });
 
-  open(view: AuthModalView = 'login', redirectUrl?: string): void {
+  open(view: AuthModalView = 'login', options?: { redirectUrl?: string; dismissible?: boolean }): void {
     this._currentView.set(view);
-    if (redirectUrl) {
-      this._redirectUrl = redirectUrl;
+    if (options?.redirectUrl) {
+      this._redirectUrl = options.redirectUrl;
     }
     this.modalService.open({
       component: AuthModalShell,
       ariaLabel: this.getAriaLabel(view),
-      dismissible: false,
+      dismissible: options?.dismissible ?? false,
     });
   }
 

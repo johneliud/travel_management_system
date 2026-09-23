@@ -20,25 +20,37 @@
       Enter the 6-digit verification code sent to your email.
     </p>
   }
+
   <div>
-    <label for="verify-otp" class="block text-sm font-medium text-(--color-text-secondary) mb-1">Verification Code</label>
-    <input
-      id="verify-otp"
-      type="text"
-      [ngModel]="otp()"
-      (ngModelChange)="otp.set($event)"
-      name="verifyOtp"
-      required
-      pattern="^\d{6}$"
-      maxlength="6"
-      class="w-full px-4 py-2 border border-(--color-border) rounded-(--radius-md) text-sm text-(--color-text) text-center tracking-widest text-lg outline-none"
-      placeholder="00000"
-      autocomplete="one-time-code"
-    />
+    <label for="otp-0" class="block text-sm font-medium text-(--color-text-secondary) mb-2">Verification Code</label>
+    <div
+      class="flex gap-2 justify-center"
+      (paste)="onPaste($event)"
+      role="group"
+      aria-label="6-digit verification code"
+    >
+      @for (digit of digits(); track $index) {
+        <input
+          #otpInput
+          [id]="$index === 0 ? 'otp-0' : null"
+          type="text"
+          inputmode="numeric"
+          maxlength="1"
+          [value]="digit"
+          (input)="onInput($index, $event)"
+          (keydown)="onKeyDown($index, $event)"
+          [attr.aria-label]="'Digit ' + ($index + 1)"
+          class="w-12 h-14 text-center text-xl font-semibold border rounded-(--radius-md) outline-none transition-colors
+            border-(--color-border) text-(--color-text) bg-(--color-surface)"
+          autocomplete="one-time-code"
+        />
+      }
+    </div>
   </div>
+
   <button
     type="submit"
-    [disabled]="loading()"
+    [disabled]="loading() || !formValid"
     class="w-full py-2.5 px-4 bg-(--color-primary) hover:bg-(--color-primary-hover) disabled:opacity-50 text-(--color-text-inverse) font-medium rounded-(--radius-md) transition-colors flex items-center justify-center gap-2"
   >
     @if (loading()) {
@@ -46,4 +58,20 @@
     }
     Verify
   </button>
+
+  <div class="text-center">
+    @if (cooldown() > 0) {
+      <span class="text-sm text-(--color-text-muted)">
+        Resend code in {{ cooldown() }}s
+      </span>
+    } @else {
+      <button
+        type="button"
+        (click)="onResend()"
+        class="text-sm text-(--color-primary) hover:text-(--color-primary-hover) font-medium"
+      >
+        Didn't receive a code? Resend
+      </button>
+    }
+  </div>
 </form>

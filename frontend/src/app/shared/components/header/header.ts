@@ -59,7 +59,7 @@ export class Header {
   }
 
   openVerifyEmail(): void {
-    this.authModal.open('verify-email');
+    this.authModal.open('verify-email', { dismissible: true });
     this.closeUserMenu();
     this.mobileMenuOpen.set(false);
   }

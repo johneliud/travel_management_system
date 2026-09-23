@@ -33,6 +33,16 @@ describe('AuthModalService', () => {
       service.open('verify-email');
       expect(service.currentView()).toBe('verify-email');
     });
+
+    it('should open modal with dismissible option', () => {
+      service.open('verify-email', { dismissible: true });
+      expect(modalService.activeConfig()?.dismissible).toBeTruthy();
+    });
+
+    it('should default to non-dismissible', () => {
+      service.open('login');
+      expect(modalService.activeConfig()?.dismissible).toBeFalsy();
+    });
   });
 
   describe('switchView', () => {
