@@ -132,6 +132,42 @@ com.travelmanagementsystem
       └── valueobject/  # Common value objects
 ```
 
+## Travel Offering Lifecycle
+
+Travel offerings progress through a state machine:
+
+```
+DRAFT -> publish -> PUBLISHED -> complete -> COMPLETED
+  │                    │
+  └──cancel -> CANCELLED
+```
+
+### Status Transitions
+
+| From      | To          | Trigger          | Endpoint                           | Constraint                                    |
+|-----------|-------------|------------------|------------------------------------|-----------------------------------------------|
+| DRAFT     | PUBLISHED   | Manager/Admin    | `POST /api/travels/{id}/publish`   | All required fields must be populated          |
+| DRAFT     | CANCELLED   | Manager/Admin    | `POST /api/travels/{id}/cancel`    | —                                              |
+| PUBLISHED | COMPLETED   | Manager/Admin    | `POST /api/travels/{id}/complete`  | Explicit action; no automatic transition yet   |
+| PUBLISHED | CANCELLED   | Manager/Admin    | `POST /api/travels/{id}/cancel`    | Phase 4/5 must handle active subscribers        |
+| COMPLETED | —           | —                | —                                  | Terminal state; no transitions out              |
+| CANCELLED | —           | —                | —                                  | Terminal state; no transitions out              |
+
+### Field Locking After Publication
+
+Once PUBLISHED, the following fields are **locked** to avoid breaking existing subscriber expectations:
+- `title`, `destinationCountry`, `destinationCity`
+- `startDate`, `endDate`, `durationDays`
+- `price`, `capacity`
+
+**Editable after publication:** `description`, `activities`, `transport`
+
+### Ownership Rules
+
+- A **Travel Manager** may only edit/publish/cancel their own travel offerings
+- An **Admin** may edit/publish/cancel any travel offering
+- A **Traveler** may not create, edit, or publish travel offerings
+
 ## Role-Based Access Control
 
 ### Roles Constants

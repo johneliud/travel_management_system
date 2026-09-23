@@ -2,6 +2,8 @@ package com.travelmanagementsystem.identity.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -33,17 +35,22 @@ public class EmailVerificationToken {
     @Column(name = "used", nullable = false)
     private boolean used;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    private VerificationTokenType type;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
     protected EmailVerificationToken() {
     }
 
-    public EmailVerificationToken(User user, String tokenHash, Instant expiresAt) {
+    public EmailVerificationToken(User user, String tokenHash, Instant expiresAt, VerificationTokenType type) {
         this.user = user;
         this.tokenHash = tokenHash;
         this.expiresAt = expiresAt;
         this.used = false;
+        this.type = type;
         this.createdAt = Instant.now();
     }
 
@@ -82,6 +89,10 @@ public class EmailVerificationToken {
 
     public Instant getExpiresAt() {
         return expiresAt;
+    }
+
+    public VerificationTokenType getType() {
+        return type;
     }
 
     public Instant getCreatedAt() {

@@ -21,7 +21,7 @@ describe('App', () => {
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('header')).toBeTruthy();
-    expect(compiled.querySelector('h1')?.textContent).toContain('TMS');
+    expect(compiled.querySelector('header')?.textContent).toContain('TMS');
   });
 
   it('should have a router outlet', () => {
@@ -29,5 +29,12 @@ describe('App', () => {
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('router-outlet')).toBeTruthy();
+  });
+
+  it('should render the footer', () => {
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('footer')).toBeTruthy();
   });
 });

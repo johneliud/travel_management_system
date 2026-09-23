@@ -50,7 +50,7 @@ class SecurityIntegrationTest extends IntegrationTest {
     void resetAndRegisterTestUser() throws Exception {
         rateLimitFilter.resetCounters();
         String body = """
-            {"email":"securitytest@example.com","password":"%s"}
+            {"firstName":"Test","lastName":"User","email":"securitytest@example.com","password":"%s"}
             """.formatted(REGISTER_PASSWORD);
         mockMvc.perform(post("/api/auth/register")
                 .header(API_VERSION_HEADER, API_VERSION)
@@ -138,7 +138,7 @@ class SecurityIntegrationTest extends IntegrationTest {
         @DisplayName("Register endpoint is accessible without token")
         void registerAccessibleWithoutToken() throws Exception {
             String body = """
-                {"email":"publictest@example.com","password":"%s"}
+                {"firstName":"Test","lastName":"User","email":"publictest@example.com","password":"%s"}
                 """.formatted(REGISTER_PASSWORD);
 
             mockMvc.perform(post("/api/auth/register")

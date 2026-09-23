@@ -1,6 +1,7 @@
 package com.travelmanagementsystem.identity.api;
 
 import com.travelmanagementsystem.identity.application.AuthService;
+import com.travelmanagementsystem.identity.application.EmailVerificationService;
 import com.travelmanagementsystem.identity.application.RegistrationService;
 import com.travelmanagementsystem.identity.application.UserProfileService;
 import com.travelmanagementsystem.shared.security.JwtPrincipal;
@@ -25,14 +26,17 @@ public class AuthController {
     private final RegistrationService registrationService;
     private final AuthService authService;
     private final UserProfileService userProfileService;
+    private final EmailVerificationService emailVerificationService;
 
     public AuthController(
             RegistrationService registrationService,
             AuthService authService,
-            UserProfileService userProfileService) {
+            UserProfileService userProfileService,
+            EmailVerificationService emailVerificationService) {
         this.registrationService = registrationService;
         this.authService = authService;
         this.userProfileService = userProfileService;
+        this.emailVerificationService = emailVerificationService;
     }
 
     @PostMapping("/register")
@@ -95,14 +99,29 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/change-password/request-otp")
+    @Operation(
+        summary = "Request OTP for password change",
+        description = "Generates a 6-digit OTP and returns it (non-production only; in production this will be sent via email). The OTP must be presented along with the current and new password to complete the change. Requires header X-API-Version: 1.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "OTP generated and returned"),
+            @ApiResponse(responseCode = "401", description = "Authentication required", content = @Content)
+        }
+    )
+    public ResponseEntity<ChangePasswordOtpResponse> requestChangePasswordOtp(
+            @AuthenticationPrincipal JwtPrincipal principal) {
+        String otp = emailVerificationService.generatePasswordChangeOtp(principal.getUserId());
+        return ResponseEntity.ok(new ChangePasswordOtpResponse(otp));
+    }
+
     @PostMapping("/change-password")
     @Operation(
         summary = "Change own password",
-        description = "Changes the authenticated user's password after verifying the current password. Revokes all existing refresh tokens to force re-login on other sessions. Requires header X-API-Version: 1.",
+        description = "Changes the authenticated user's password after verifying the current password and a valid OTP from /change-password/request-otp. Revokes all existing refresh tokens to force re-login on other sessions. Requires header X-API-Version: 1.",
         responses = {
             @ApiResponse(responseCode = "204", description = "Password changed successfully"),
             @ApiResponse(responseCode = "400", description = "Validation error", content = @Content),
-            @ApiResponse(responseCode = "401", description = "Current password is incorrect", content = @Content)
+            @ApiResponse(responseCode = "401", description = "Current password is incorrect or OTP is invalid/expired", content = @Content)
         }
     )
     public ResponseEntity<Void> changePassword(

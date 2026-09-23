@@ -44,7 +44,7 @@ class RefreshLogoutIntegrationTest extends IntegrationTest {
     @BeforeEach
     void registerTestUser() throws Exception {
         String body = """
-            {"email":"%s","password":"%s"}
+            {"firstName":"Test","lastName":"User","email":"%s","password":"%s"}
             """.formatted(TEST_EMAIL, TEST_PASSWORD);
         mockMvc.perform(post("/api/auth/register")
                 .header(API_VERSION_HEADER, API_VERSION)

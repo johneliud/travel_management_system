@@ -37,4 +37,21 @@ public class EmailVerificationController {
         emailVerificationService.verify(request);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/resend-verification")
+    @Operation(
+        summary = "Resend email verification OTP",
+        description = "Generates a new 6-digit OTP and invalidates any previous unused OTPs. A cooldown of 60 seconds applies between requests. Returns the new OTP (non-production only; in production this will be sent via email). Requires header X-API-Version: 1.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "New OTP generated and returned"),
+            @ApiResponse(responseCode = "400", description = "Validation error or email already verified", content = @Content),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
+            @ApiResponse(responseCode = "429", description = "Cooldown active, too many requests", content = @Content)
+        }
+    )
+    public ResponseEntity<ResendVerificationResponse> resendVerification(
+            @Valid @RequestBody ResendVerificationRequest request) {
+        String otp = emailVerificationService.resendOtp(request);
+        return ResponseEntity.ok(new ResendVerificationResponse(otp));
+    }
 }

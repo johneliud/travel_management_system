@@ -4,6 +4,7 @@ import com.travelmanagementsystem.identity.api.RegisterRequest;
 import com.travelmanagementsystem.identity.api.RegisterResponse;
 import com.travelmanagementsystem.identity.domain.Role;
 import com.travelmanagementsystem.identity.domain.User;
+import com.travelmanagementsystem.identity.domain.VerificationTokenType;
 import com.travelmanagementsystem.identity.infrastructure.persistence.RoleRepository;
 import com.travelmanagementsystem.identity.infrastructure.persistence.UserRepository;
 import com.travelmanagementsystem.shared.exception.ConflictException;
@@ -43,7 +44,7 @@ public class RegistrationService {
 
         String hashedPassword = passwordHasher.hash(request.password());
 
-        User user = new User(request.email(), hashedPassword);
+        User user = new User(request.email(), hashedPassword, request.firstName(), request.lastName());
 
         Role travelerRole = roleRepository.findByName(Roles.TRAVELER)
             .orElseThrow(() -> new IllegalStateException("TRAVELER role not found"));
@@ -51,12 +52,14 @@ public class RegistrationService {
 
         User saved = userRepository.save(user);
 
-        String otp = emailVerificationService.generateOtp(saved);
+        String otp = emailVerificationService.generateOtp(saved, VerificationTokenType.EMAIL_VERIFICATION);
 
         log.debug("Registered new user with id {}", saved.getId());
 
         return new RegisterResponse(
             saved.getId(),
+            saved.getFirstName(),
+            saved.getLastName(),
             saved.getEmail(),
             saved.getStatus(),
             saved.getCreatedAt(),

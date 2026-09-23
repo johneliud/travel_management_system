@@ -52,7 +52,7 @@ class EmailVerificationIntegrationTest extends IntegrationTest {
 
     private String registerUser(String email) throws Exception {
         String body = """
-            {"email":"%s","password":"%s"}
+            {"firstName":"Test","lastName":"User","email":"%s","password":"%s"}
             """.formatted(email, TEST_PASSWORD);
         MvcResult result = mockMvc.perform(post("/api/auth/register")
                 .header(API_VERSION_HEADER, API_VERSION)
@@ -124,7 +124,8 @@ class EmailVerificationIntegrationTest extends IntegrationTest {
             tokenRepository.findByTokenHash(tokenHash).ifPresent(tokenRepository::delete);
 
             EmailVerificationToken expiredToken = new EmailVerificationToken(
-                    user, tokenHash, Instant.now().minus(1, ChronoUnit.HOURS));
+                    user, tokenHash, Instant.now().minus(1, ChronoUnit.HOURS),
+                    com.travelmanagementsystem.identity.domain.VerificationTokenType.EMAIL_VERIFICATION);
             tokenRepository.save(expiredToken);
 
             mockMvc.perform(post("/api/auth/verify-email")

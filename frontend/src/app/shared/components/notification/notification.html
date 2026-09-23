@@ -1,0 +1,15 @@
+<div
+  class="fixed top-24 right-4 z-(--z-toast) flex flex-col gap-3 max-w-[75vw] sm:right-8 sm:max-w-100 pointer-events-none"
+>
+  @for (notification of notificationService.notifications(); track notification.id) {
+    <div
+      [class]="getContainerClass(notification.type)"
+      role="alert"
+      aria-live="polite"
+    >
+      <p class="flex-1 m-0 text-sm leading-normal wrap-break-word">
+        {{ notification.message }}
+      </p>
+    </div>
+  }
+</div>

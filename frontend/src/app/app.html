@@ -1,11 +1,11 @@
-<header class="bg-(--color-surface) border-b border-(--color-border) px-6 py-4">
-  <div class="max-w-screen-2xl mx-auto flex items-center justify-between">
-    <h1 class="text-xl text-(--color-text)">TMS</h1>
+<app-header class="sticky top-0 z-(--z-sticky)" />
 
-    <nav aria-label="Main navigation"></nav>
-  </div>
-</header>
-
-<main class="max-w-screen-2xl mx-auto px-6 py-8">
+<main class="max-w-screen-2xl mx-auto py-8 flex-1">
   <router-outlet />
 </main>
+
+<app-footer />
+
+<app-modal-host />
+
+<app-notification />

@@ -1,0 +1,163 @@
+<form (submit)="$event.preventDefault(); onSubmit()" class="space-y-4" novalidate>
+  <div class="grid grid-cols-2 gap-3">
+    <div>
+      <label
+        for="register-first-name"
+        class="block text-sm font-medium text-(--color-text-secondary) mb-1"
+        >First Name</label
+      >
+      <input
+        id="register-first-name"
+        type="text"
+        [value]="firstName()"
+        (input)="firstName.set($any($event.target).value)"
+        (blur)="markTouched('firstName')"
+        name="registerFirstName"
+        required
+        maxlength="100"
+        [class]="firstNameError ? 'border-(--color-error)' : ''"
+        class="w-full px-4 py-2.5 border border-(--color-border) rounded-(--radius-md) text-sm text-(--color-text) placeholder:text-(--color-text-disabled) outline-none"
+        placeholder="John"
+        autocomplete="given-name"
+      />
+      @if (firstNameError) {
+        <p class="mt-1 text-xs text-(--color-error)">{{ firstNameError }}</p>
+      }
+    </div>
+    <div>
+      <label
+        for="register-last-name"
+        class="block text-sm font-medium text-(--color-text-secondary) mb-1"
+        >Last Name</label
+      >
+      <input
+        id="register-last-name"
+        type="text"
+        [value]="lastName()"
+        (input)="lastName.set($any($event.target).value)"
+        (blur)="markTouched('lastName')"
+        name="registerLastName"
+        required
+        maxlength="100"
+        [class]="lastNameError ? 'border-(--color-error)' : ''"
+        class="w-full px-4 py-2.5 border border-(--color-border) rounded-(--radius-md) text-sm text-(--color-text) placeholder:text-(--color-text-disabled) outline-none"
+        placeholder="Doe"
+        autocomplete="family-name"
+      />
+      @if (lastNameError) {
+        <p class="mt-1 text-xs text-(--color-error)">{{ lastNameError }}</p>
+      }
+    </div>
+  </div>
+
+  <div>
+    <label for="register-email" class="block text-sm font-medium text-(--color-text-secondary) mb-1"
+      >Email</label
+    >
+    <input
+      id="register-email"
+      type="email"
+      [value]="email()"
+      (input)="email.set($any($event.target).value)"
+      (blur)="markTouched('email')"
+      name="registerEmail"
+      required
+      [class]="emailError ? 'border-(--color-error)' : ''"
+      class="w-full px-4 py-2.5 border border-(--color-border) rounded-(--radius-md) text-sm text-(--color-text) placeholder:text-(--color-text-disabled) outline-none"
+      placeholder="you@example.com"
+      autocomplete="email"
+    />
+    @if (emailError) {
+      <p class="mt-1 text-xs text-(--color-error)">{{ emailError }}</p>
+    }
+  </div>
+
+  <div>
+    <label
+      for="register-password"
+      class="block text-sm font-medium text-(--color-text-secondary) mb-1"
+      >Password</label
+    >
+    <div class="relative">
+      <input
+        id="register-password"
+        [type]="showPassword() ? 'text' : 'password'"
+        [value]="password()"
+        (input)="password.set($any($event.target).value)"
+        (blur)="markTouched('password')"
+        name="registerPassword"
+        required
+        minlength="8"
+        [class]="passwordError ? 'border-(--color-error) pr-10' : 'pr-10'"
+        class="w-full px-4 py-2.5 border border-(--color-border) rounded-(--radius-md) text-sm text-(--color-text) placeholder:text-(--color-text-disabled) outline-none"
+        placeholder="Min 8 characters"
+        autocomplete="new-password"
+      />
+      <button
+        type="button"
+        (click)="togglePassword()"
+        class="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-(--radius-md) text-(--color-text-muted) hover:text-(--color-text) hover:bg-(--color-surface-sunken) transition-colors"
+        [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+      >
+        @if (showPassword()) {
+          <svg lucideEyeOff [size]="18" />
+        } @else {
+          <svg lucideEye [size]="18" />
+        }
+      </button>
+    </div>
+    @if (passwordError) {
+      <p class="mt-1 text-xs text-(--color-error)">{{ passwordError }}</p>
+    }
+  </div>
+
+  <div>
+    <label
+      for="register-confirm"
+      class="block text-sm font-medium text-(--color-text-secondary) mb-1"
+      >Confirm Password</label
+    >
+    <div class="relative">
+      <input
+        id="register-confirm"
+        [type]="showConfirmPassword() ? 'text' : 'password'"
+        [value]="confirmPassword()"
+        (input)="confirmPassword.set($any($event.target).value)"
+        (blur)="markTouched('confirmPassword')"
+        name="registerConfirmPassword"
+        required
+        [class]="confirmPasswordError ? 'border-(--color-error) pr-10' : 'pr-10'"
+        class="w-full px-4 py-2.5 border border-(--color-border) rounded-(--radius-md) text-sm text-(--color-text) placeholder:text-(--color-text-disabled) outline-none"
+        placeholder="Repeat your password"
+        autocomplete="new-password"
+      />
+      <button
+        type="button"
+        (click)="toggleConfirmPassword()"
+        class="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-(--radius-md) text-(--color-text-muted) hover:text-(--color-text) hover:bg-(--color-surface-sunken) transition-colors"
+        [attr.aria-label]="showConfirmPassword() ? 'Hide password' : 'Show password'"
+      >
+        @if (showConfirmPassword()) {
+          <svg lucideEyeOff [size]="18" />
+        } @else {
+          <svg lucideEye [size]="18" />
+        }
+      </button>
+    </div>
+    @if (confirmPasswordError) {
+      <p class="mt-1 text-xs text-(--color-error)">{{ confirmPasswordError }}</p>
+    }
+  </div>
+
+  <button
+    type="submit"
+    [disabled]="loading()"
+    class="w-full py-2.5 px-4 bg-(--color-primary) hover:bg-(--color-primary-hover) disabled:opacity-50 text-(--color-text-inverse) font-medium rounded-(--radius-md) transition-colors flex items-center justify-center gap-2"
+  >
+    @if (loading()) {
+      Creating Account...
+    } @else {
+      Create Account
+    }
+  </button>
+</form>

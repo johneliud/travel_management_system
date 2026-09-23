@@ -8,6 +8,12 @@ public record RegisterResponse(
 	@Schema(description = "User ID", example = "1")
 	Long id,
 
+	@Schema(description = "First name", example = "John")
+	String firstName,
+
+	@Schema(description = "Last name", example = "Doe")
+	String lastName,
+
 	@Schema(description = "User email address", example = "user@example.com")
 	String email,
 
