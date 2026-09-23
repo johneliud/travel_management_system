@@ -52,7 +52,7 @@ class EmailVerificationIntegrationTest extends IntegrationTest {
 
     private String registerUser(String email) throws Exception {
         String body = """
-            {"email":"%s","password":"%s"}
+            {"firstName":"Test","lastName":"User","email":"%s","password":"%s"}
             """.formatted(email, TEST_PASSWORD);
         MvcResult result = mockMvc.perform(post("/api/auth/register")
                 .header(API_VERSION_HEADER, API_VERSION)

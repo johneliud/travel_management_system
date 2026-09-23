@@ -41,7 +41,7 @@ class FullAuthLifecycleIntegrationTest extends IntegrationTest {
                 .header(API_VERSION_HEADER, API_VERSION)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                    {"email":"%s","password":"%s"}
+                    {"firstName":"Test","lastName":"User","email":"%s","password":"%s"}
                     """.formatted(email, originalPassword)))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.email").value(email))

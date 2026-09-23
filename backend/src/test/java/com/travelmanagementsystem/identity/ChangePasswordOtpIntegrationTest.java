@@ -35,7 +35,7 @@ class ChangePasswordOtpIntegrationTest extends IntegrationTest {
                 .header(API_VERSION_HEADER, API_VERSION)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                    {"email":"%s","password":"%s"}
+                    {"firstName":"Test","lastName":"User","email":"%s","password":"%s"}
                     """.formatted(email, TEST_PASSWORD)))
             .andExpect(status().isCreated());
 

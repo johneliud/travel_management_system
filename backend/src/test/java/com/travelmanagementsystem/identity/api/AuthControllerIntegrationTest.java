@@ -36,7 +36,7 @@ class AuthControllerIntegrationTest extends IntegrationTest {
         @BeforeEach
         void ensureTestData() throws Exception {
             String body = """
-                {"email":"existing@example.com","password":"%s"}
+                {"firstName":"Test","lastName":"User","email":"existing@example.com","password":"%s"}
                 """.formatted(REGISTER_PASSWORD);
             mockMvc.perform(post("/api/auth/register")
                     .header(API_VERSION_HEADER, API_VERSION)
@@ -53,7 +53,7 @@ class AuthControllerIntegrationTest extends IntegrationTest {
         @DisplayName("201 Created with valid registration data")
         void registerSuccess() throws Exception {
             String body = """
-                {"email":"newuser@example.com","password":"%s"}
+                {"firstName":"Test","lastName":"User","email":"newuser@example.com","password":"%s"}
                 """.formatted(TestData.generateValidPassword());
 
             mockMvc.perform(post("/api/auth/register")
@@ -72,7 +72,7 @@ class AuthControllerIntegrationTest extends IntegrationTest {
         @DisplayName("409 Conflict when email already exists")
         void duplicateEmailReturnsConflict() throws Exception {
             String body = """
-                {"email":"existing@example.com","password":"%s"}
+                {"firstName":"Test","lastName":"User","email":"existing@example.com","password":"%s"}
                 """.formatted(TestData.generateValidPassword());
 
             mockMvc.perform(post("/api/auth/register")
@@ -88,7 +88,7 @@ class AuthControllerIntegrationTest extends IntegrationTest {
         @DisplayName("400 Bad Request when password violates policy")
         void weakPasswordReturnsBadRequest() throws Exception {
             String body = """
-                {"email":"weak@example.com","password":"password"}
+                {"firstName":"Test","lastName":"User","email":"weak@example.com","password":"password"}
                 """;
 
             mockMvc.perform(post("/api/auth/register")
@@ -104,7 +104,7 @@ class AuthControllerIntegrationTest extends IntegrationTest {
         @DisplayName("400 Bad Request when email is invalid")
         void invalidEmailReturnsBadRequest() throws Exception {
             String body = """
-                {"email":"not-an-email","password":"%s"}
+                {"firstName":"Test","lastName":"User","email":"not-an-email","password":"%s"}
                 """.formatted(TestData.generateValidPassword());
 
             mockMvc.perform(post("/api/auth/register")
@@ -119,7 +119,7 @@ class AuthControllerIntegrationTest extends IntegrationTest {
         @DisplayName("400 Bad Request when password is missing uppercase")
         void passwordWithoutUppercaseReturnsBadRequest() throws Exception {
             String body = """
-                {"email":"lower@example.com","password":"str0ng!pass"}
+                {"firstName":"Test","lastName":"User","email":"lower@example.com","password":"str0ng!pass"}
                 """;
 
             mockMvc.perform(post("/api/auth/register")
@@ -134,7 +134,7 @@ class AuthControllerIntegrationTest extends IntegrationTest {
         @DisplayName("400 Bad Request when password is too short")
         void shortPasswordReturnsBadRequest() throws Exception {
             String body = """
-                {"email":"short@example.com","password":"Ab1!"}
+                {"firstName":"Test","lastName":"User","email":"short@example.com","password":"Ab1!"}
                 """;
 
             mockMvc.perform(post("/api/auth/register")
@@ -149,7 +149,7 @@ class AuthControllerIntegrationTest extends IntegrationTest {
         @DisplayName("201 Created. Password hash is never in response body")
         void passwordHashNotExposed() throws Exception {
             String body = """
-                {"email":"secure@example.com","password":"%s"}
+                {"firstName":"Test","lastName":"User","email":"secure@example.com","password":"%s"}
                 """.formatted(TestData.generateValidPassword());
 
             MvcResult result = mockMvc.perform(post("/api/auth/register")
@@ -174,7 +174,7 @@ class AuthControllerIntegrationTest extends IntegrationTest {
         @BeforeEach
         void registerUser() throws Exception {
             String body = """
-                {"email":"%s","password":"%s"}
+                {"firstName":"Test","lastName":"User","email":"%s","password":"%s"}
                 """.formatted(LOGIN_EMAIL, REGISTER_PASSWORD);
             mockMvc.perform(post("/api/auth/register")
                     .header(API_VERSION_HEADER, API_VERSION)
@@ -273,7 +273,7 @@ class AuthControllerIntegrationTest extends IntegrationTest {
             String disabledEmail = "disabled@example.com";
 
             String registerBody = """
-                {"email":"%s","password":"%s"}
+                {"firstName":"Test","lastName":"User","email":"%s","password":"%s"}
                 """.formatted(disabledEmail, REGISTER_PASSWORD);
             mockMvc.perform(post("/api/auth/register")
                     .header(API_VERSION_HEADER, API_VERSION)

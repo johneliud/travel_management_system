@@ -48,7 +48,7 @@ class UserProfileIntegrationTest extends IntegrationTest {
 
     private String registerUser(String email) throws Exception {
         String body = """
-            {"email":"%s","password":"%s"}
+            {"firstName":"Test","lastName":"User","email":"%s","password":"%s"}
             """.formatted(email, TEST_PASSWORD);
         mockMvc.perform(post("/api/auth/register")
                 .header(API_VERSION_HEADER, API_VERSION)
@@ -160,7 +160,7 @@ class UserProfileIntegrationTest extends IntegrationTest {
 
             String otherEmail = "dupupdate@example.com";
             String registerBody = """
-                {"email":"%s","password":"%s"}
+                {"firstName":"Test","lastName":"User","email":"%s","password":"%s"}
                 """.formatted(otherEmail, TEST_PASSWORD);
             mockMvc.perform(post("/api/auth/register")
                     .header(API_VERSION_HEADER, API_VERSION)
@@ -289,7 +289,7 @@ class UserProfileIntegrationTest extends IntegrationTest {
                     .header(API_VERSION_HEADER, API_VERSION)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content("""
-                        {"email":"%s","password":"%s"}
+                        {"firstName":"Test","lastName":"User","email":"%s","password":"%s"}
                         """.formatted(email, TEST_PASSWORD)))
                 .andExpect(result -> {
                     int status = result.getResponse().getStatus();

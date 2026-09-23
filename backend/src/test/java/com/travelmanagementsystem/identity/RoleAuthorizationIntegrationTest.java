@@ -67,7 +67,7 @@ class RoleAuthorizationIntegrationTest extends IntegrationTest {
 
     private void registerUser(String email) throws Exception {
         String body = """
-            {"email":"%s","password":"%s"}
+            {"firstName":"Test","lastName":"User","email":"%s","password":"%s"}
             """.formatted(email, TEST_PASSWORD);
         mockMvc.perform(post("/api/auth/register")
                 .header(API_VERSION_HEADER, API_VERSION)
