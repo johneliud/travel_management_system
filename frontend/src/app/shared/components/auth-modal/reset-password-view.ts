@@ -1,5 +1,7 @@
 import { Component, signal, inject } from '@angular/core';
+import type { OnInit } from '@angular/core';
 import { AuthModalService } from '../../../core/auth/auth-modal.service';
+import { environment } from '../../../../environment/environment';
 import { LucideEye, LucideEyeOff, LucideLoaderCircle } from '@lucide/angular';
 
 @Component({
@@ -7,7 +9,7 @@ import { LucideEye, LucideEyeOff, LucideLoaderCircle } from '@lucide/angular';
   imports: [LucideEye, LucideEyeOff, LucideLoaderCircle],
   templateUrl: './reset-password-view.html',
 })
-export class ResetPasswordView {
+export class ResetPasswordView implements OnInit {
   private readonly authModal = inject(AuthModalService);
 
   readonly otp = signal('');
@@ -17,10 +19,19 @@ export class ResetPasswordView {
   readonly showConfirmPassword = signal(false);
   readonly loading = signal(false);
   readonly error = signal('');
-  readonly success = signal('');
+  readonly errorType = signal<'expired' | 'used' | 'invalid' | null>(null);
   readonly touchedFields = signal<Set<string>>(new Set());
 
   readonly userEmail = this.authModal.userEmail;
+
+  ngOnInit(): void {
+    if (!environment.production) {
+      const pendingOtp = this.authModal.consumePendingOtp();
+      if (pendingOtp) {
+        this.otp.set(pendingOtp);
+      }
+    }
+  }
 
   markTouched(field: string): void {
     this.touchedFields.update(fields => new Set(fields).add(field));
@@ -68,31 +79,49 @@ export class ResetPasswordView {
     this.showConfirmPassword.update(v => !v);
   }
 
+  parseError(message: string): { text: string; type: 'expired' | 'used' | 'invalid' } {
+    if (message.includes('expired')) {
+      return { text: 'This code has expired. Please request a new one.', type: 'expired' };
+    }
+    if (message.includes('already been used')) {
+      return { text: 'This code has already been used. Please request a new one.', type: 'used' };
+    }
+    return { text: 'The code you entered is incorrect. Please try again.', type: 'invalid' };
+  }
+
   async onSubmit(): Promise<void> {
     if (!this.formValid) return;
 
     this.loading.set(true);
     this.error.set('');
+    this.errorType.set(null);
 
     try {
-      const response = await fetch('/api/auth/change-password', {
+      const email = this.userEmail();
+      if (!email) {
+        this.error.set('No email set. Please go back and try again.');
+        return;
+      }
+
+      const response = await fetch('/api/auth/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-API-Version': '1' },
         body: JSON.stringify({
-          currentPassword: '',
-          newPassword: this.newPassword(),
+          email,
           otp: this.otp(),
+          newPassword: this.newPassword(),
         }),
       });
 
       if (!response.ok) {
         const body = await response.json().catch(() => ({}));
-        this.error.set(body.message || 'Password reset failed');
+        const parsed = this.parseError(body.message || 'Password reset failed');
+        this.error.set(parsed.text);
+        this.errorType.set(parsed.type);
         return;
       }
 
-      this.success.set('Password reset successful! You can now log in.');
-      setTimeout(() => this.authModal.switchView('login'), 2000);
+      this.authModal.switchView('login');
     } catch {
       this.error.set('Network error. Please try again.');
     } finally {
