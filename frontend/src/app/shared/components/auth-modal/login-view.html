@@ -16,7 +16,7 @@
       name="loginEmail"
       required
       [class]="emailError ? 'border-(--color-error)' : ''"
-      class="w-full px-4 py-2.5 border border-(--color-border) rounded-(--radius-md) text-sm text-(--color-text) placeholder:text-(--color-text-disabled) focus:border-(--color-border-focus) focus:ring-1 focus:ring-(--color-border-focus) outline-none"
+      class="w-full px-4 py-2.5 border border-(--color-border) rounded-(--radius-md) text-sm text-(--color-text) placeholder:text-(--color-text-disabled) outline-none"
       placeholder="you@example.com"
       autocomplete="email"
     />
@@ -37,7 +37,7 @@
         name="loginPassword"
         required
         [class]="passwordError ? 'border-(--color-error) pr-10' : 'pr-10'"
-        class="w-full px-4 py-2.5 border border-(--color-border) rounded-(--radius-md) text-sm text-(--color-text) placeholder:text-(--color-text-disabled) focus:border-(--color-border-focus) focus:ring-1 focus:ring-(--color-border-focus) outline-none"
+        class="w-full px-4 py-2.5 border border-(--color-border) rounded-(--radius-md) text-sm text-(--color-text) placeholder:text-(--color-text-disabled) outline-none"
         placeholder="Enter your password"
         autocomplete="current-password"
       />
@@ -48,9 +48,9 @@
         [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
       >
         @if (showPassword()) {
-          <app-icon name="eye-off" [size]="18" />
+          <svg lucideEyeOff [size]="18" />
         } @else {
-          <app-icon name="eye" [size]="18" />
+          <svg lucideEye [size]="18" />
         }
       </button>
     </div>
@@ -75,13 +75,9 @@
     class="w-full py-2.5 px-4 bg-(--color-primary) hover:bg-(--color-primary-hover) disabled:opacity-50 text-(--color-text-inverse) font-medium rounded-(--radius-md) transition-colors flex items-center justify-center gap-2"
   >
     @if (loading()) {
-      <app-icon name="loader2" [size]="18" class="animate-spin" />
+      <svg lucideLoaderCircle [size]="18" class="animate-spin" />
     }
     Log In
   </button>
 </form>
 
-<p class="mt-4 text-center text-sm text-(--color-text-muted)">
-  Don't have an account?
-  <button (click)="switchView('register')" class="text-(--color-primary) hover:text-(--color-primary-hover) font-medium">Register</button>
-</p>

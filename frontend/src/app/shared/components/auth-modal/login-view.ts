@@ -1,11 +1,11 @@
 import { Component, signal, inject } from '@angular/core';
 import { AuthModalService } from '../../../core/auth/auth-modal.service';
 import { SessionService } from '../../../core/auth/session.service';
-import { IconComponent } from '../icon/icon';
+import { LucideEye, LucideEyeOff, LucideLoaderCircle } from '@lucide/angular';
 
 @Component({
   selector: 'app-login-view',
-  imports: [IconComponent],
+  imports: [LucideEye, LucideEyeOff, LucideLoaderCircle],
   templateUrl: './login-view.html',
 })
 export class LoginView {
