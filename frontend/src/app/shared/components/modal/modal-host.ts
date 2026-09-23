@@ -14,7 +14,7 @@ import { ModalService } from '../../../core/modal/modal.service';
   selector: 'app-modal-host',
   template: `
     <div
-      class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+      class="fixed inset-0 z-(--z-modal) bg-black/50 flex items-center justify-center p-4"
       [class]="isOpen() ? '' : 'hidden'"
       (click)="onBackdropClick($event)"
       (keydown)="onKeyDown($event)"

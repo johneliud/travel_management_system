@@ -1,20 +1,26 @@
 import { Component, signal, inject } from '@angular/core';
 import { AuthModalService } from '../../../core/auth/auth-modal.service';
+import { NotificationService } from '../../../core/notification/notification.service';
 import { environment } from '../../../../environment/environment';
-import { LucideLoaderCircle } from '@lucide/angular';
 
 @Component({
   selector: 'app-forgot-password-view',
-  imports: [LucideLoaderCircle],
+  imports: [],
   templateUrl: './forgot-password-view.html',
 })
 export class ForgotPasswordView {
   private readonly authModal = inject(AuthModalService);
+  private readonly notification = inject(NotificationService);
 
   readonly email = signal('');
   readonly loading = signal(false);
   readonly error = signal('');
   readonly touchedFields = signal<Set<string>>(new Set());
+
+  private setError(message: string): void {
+    this.error.set(message);
+    if (message) this.notification.error(message);
+  }
 
   markTouched(field: string): void {
     this.touchedFields.update((fields) => new Set(fields).add(field));
@@ -39,7 +45,7 @@ export class ForgotPasswordView {
     if (!this.formValid) return;
 
     this.loading.set(true);
-    this.error.set('');
+    this.setError('');
 
     try {
       const response = await fetch('/api/auth/forgot-password', {
@@ -50,7 +56,7 @@ export class ForgotPasswordView {
 
       if (!response.ok) {
         const body = await response.json().catch(() => ({}));
-        this.error.set(body.message || 'Failed to send reset code');
+        this.setError(body.message || 'Failed to send reset code');
         return;
       }
 
@@ -63,7 +69,7 @@ export class ForgotPasswordView {
 
       this.authModal.switchView('reset-password');
     } catch {
-      this.error.set('Network error. Please try again.');
+      this.setError('Network error. Please try again.');
     } finally {
       this.loading.set(false);
     }

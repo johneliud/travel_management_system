@@ -1,17 +1,19 @@
 import { Component, signal, inject } from '@angular/core';
 import { AuthModalService } from '../../../core/auth/auth-modal.service';
 import { SessionService } from '../../../core/auth/session.service';
+import { NotificationService } from '../../../core/notification/notification.service';
 import { environment } from '../../../../environment/environment';
-import { LucideEye, LucideEyeOff, LucideLoaderCircle } from '@lucide/angular';
+import { LucideEye, LucideEyeOff } from '@lucide/angular';
 
 @Component({
   selector: 'app-register-view',
-  imports: [LucideEye, LucideEyeOff, LucideLoaderCircle],
+  imports: [LucideEye, LucideEyeOff],
   templateUrl: './register-view.html',
 })
 export class RegisterView {
   private readonly authModal = inject(AuthModalService);
   private readonly session = inject(SessionService);
+  private readonly notification = inject(NotificationService);
 
   readonly firstName = signal('');
   readonly lastName = signal('');
@@ -23,6 +25,11 @@ export class RegisterView {
   readonly loading = signal(false);
   readonly error = signal('');
   readonly touchedFields = signal<Set<string>>(new Set());
+
+  private setError(message: string): void {
+    this.error.set(message);
+    if (message) this.notification.error(message);
+  }
 
   markTouched(field: string): void {
     this.touchedFields.update((fields) => new Set(fields).add(field));
@@ -85,7 +92,7 @@ export class RegisterView {
   }
 
   switchView(view: 'login'): void {
-    this.error.set('');
+    this.setError('');
     this.authModal.switchView(view);
   }
 
@@ -101,7 +108,7 @@ export class RegisterView {
     if (!this.formValid) return;
 
     this.loading.set(true);
-    this.error.set('');
+    this.setError('');
 
     try {
       const response = await fetch('/api/auth/register', {
@@ -118,9 +125,9 @@ export class RegisterView {
       if (!response.ok) {
         const body = await response.json().catch(() => ({}));
         if (response.status === 409 && body.code === 'EMAIL_ALREADY_IN_USE') {
-          this.error.set('An account with this email already exists');
+          this.setError('An account with this email already exists');
         } else {
-          this.error.set(body.message || 'Registration failed');
+          this.setError(body.message || 'Registration failed');
         }
         return;
       }
@@ -140,7 +147,7 @@ export class RegisterView {
 
       this.authModal.switchView('verify-email');
     } catch {
-      this.error.set('Network error. Please try again.');
+      this.setError('Network error. Please try again.');
     } finally {
       this.loading.set(false);
     }

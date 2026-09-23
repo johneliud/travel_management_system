@@ -1,16 +1,18 @@
 import { Component, signal, inject } from '@angular/core';
 import { AuthModalService } from '../../../core/auth/auth-modal.service';
 import { SessionService } from '../../../core/auth/session.service';
-import { LucideEye, LucideEyeOff, LucideLoaderCircle } from '@lucide/angular';
+import { NotificationService } from '../../../core/notification/notification.service';
+import { LucideEye, LucideEyeOff } from '@lucide/angular';
 
 @Component({
   selector: 'app-change-password-view',
-  imports: [LucideEye, LucideEyeOff, LucideLoaderCircle],
+  imports: [LucideEye, LucideEyeOff],
   templateUrl: './change-password-view.html',
 })
 export class ChangePasswordView {
   private readonly authModal = inject(AuthModalService);
   private readonly session = inject(SessionService);
+  private readonly notification = inject(NotificationService);
 
   readonly currentPassword = signal('');
   readonly newPassword = signal('');
@@ -25,6 +27,16 @@ export class ChangePasswordView {
   readonly otp = signal('');
   readonly otpSent = signal(false);
   readonly touchedFields = signal<Set<string>>(new Set());
+
+  private setError(message: string): void {
+    this.error.set(message);
+    if (message) this.notification.error(message);
+  }
+
+  private setSuccess(message: string): void {
+    this.success.set(message);
+    if (message) this.notification.success(message);
+  }
 
   markTouched(field: string): void {
     this.touchedFields.update((fields) => new Set(fields).add(field));
@@ -97,7 +109,7 @@ export class ChangePasswordView {
     if (!this.formValid) return;
 
     this.requestingOtp.set(true);
-    this.error.set('');
+    this.setError('');
 
     try {
       const token = this.session.token();
@@ -112,13 +124,13 @@ export class ChangePasswordView {
 
       if (!response.ok) {
         const body = await response.json().catch(() => ({}));
-        this.error.set(body.message || 'Failed to send OTP');
+        this.setError(body.message || 'Failed to send OTP');
         return;
       }
 
       this.otpSent.set(true);
     } catch {
-      this.error.set('Network error. Please try again.');
+      this.setError('Network error. Please try again.');
     } finally {
       this.requestingOtp.set(false);
     }
@@ -128,7 +140,7 @@ export class ChangePasswordView {
     if (!this.submitValid) return;
 
     this.loading.set(true);
-    this.error.set('');
+    this.setError('');
 
     try {
       const token = this.session.token();
@@ -148,15 +160,15 @@ export class ChangePasswordView {
 
       if (!response.ok) {
         const body = await response.json().catch(() => ({}));
-        this.error.set(body.message || 'Password change failed');
+        this.setError(body.message || 'Password change failed');
         return;
       }
 
-      this.success.set('Password changed successfully! Please log in again.');
+      this.setSuccess('Password changed successfully! Please log in again.');
       this.session.clearSession();
       setTimeout(() => this.authModal.close(), 2000);
     } catch {
-      this.error.set('Network error. Please try again.');
+      this.setError('Network error. Please try again.');
     } finally {
       this.loading.set(false);
     }

@@ -1,16 +1,18 @@
 import { Component, signal, inject } from '@angular/core';
 import type { OnInit } from '@angular/core';
 import { AuthModalService } from '../../../core/auth/auth-modal.service';
+import { NotificationService } from '../../../core/notification/notification.service';
 import { environment } from '../../../../environment/environment';
-import { LucideEye, LucideEyeOff, LucideLoaderCircle } from '@lucide/angular';
+import { LucideEye, LucideEyeOff } from '@lucide/angular';
 
 @Component({
   selector: 'app-reset-password-view',
-  imports: [LucideEye, LucideEyeOff, LucideLoaderCircle],
+  imports: [LucideEye, LucideEyeOff],
   templateUrl: './reset-password-view.html',
 })
 export class ResetPasswordView implements OnInit {
   private readonly authModal = inject(AuthModalService);
+  private readonly notification = inject(NotificationService);
 
   readonly otp = signal('');
   readonly newPassword = signal('');
@@ -23,6 +25,11 @@ export class ResetPasswordView implements OnInit {
   readonly touchedFields = signal<Set<string>>(new Set());
 
   readonly userEmail = this.authModal.userEmail;
+
+  private setError(message: string): void {
+    this.error.set(message);
+    if (message) this.notification.error(message);
+  }
 
   ngOnInit(): void {
     if (!environment.production) {
@@ -95,13 +102,13 @@ export class ResetPasswordView implements OnInit {
     if (!this.formValid) return;
 
     this.loading.set(true);
-    this.error.set('');
+    this.setError('');
     this.errorType.set(null);
 
     try {
       const email = this.userEmail();
       if (!email) {
-        this.error.set('No email set. Please go back and try again.');
+        this.setError('No email set. Please go back and try again.');
         return;
       }
 
@@ -118,14 +125,14 @@ export class ResetPasswordView implements OnInit {
       if (!response.ok) {
         const body = await response.json().catch(() => ({}));
         const parsed = this.parseError(body.message || 'Password reset failed');
-        this.error.set(parsed.text);
+        this.setError(parsed.text);
         this.errorType.set(parsed.type);
         return;
       }
 
       this.authModal.switchView('login');
     } catch {
-      this.error.set('Network error. Please try again.');
+      this.setError('Network error. Please try again.');
     } finally {
       this.loading.set(false);
     }

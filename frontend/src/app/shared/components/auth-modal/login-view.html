@@ -1,11 +1,3 @@
-@if (error()) {
-  <div
-    class="mb-4 px-4 py-3 rounded-(--radius-md) bg-(--color-error-light) text-(--color-error) text-sm"
-  >
-    {{ error() }}
-  </div>
-}
-
 <form (submit)="$event.preventDefault(); onSubmit()" class="space-y-4" novalidate>
   <div>
     <label for="login-email" class="block text-sm font-medium text-(--color-text-secondary) mb-1"
@@ -81,8 +73,9 @@
     class="w-full py-2.5 px-4 bg-(--color-primary) hover:bg-(--color-primary-hover) disabled:opacity-50 text-(--color-text-inverse) font-medium rounded-(--radius-md) transition-colors flex items-center justify-center gap-2"
   >
     @if (loading()) {
-      <svg lucideLoaderCircle [size]="18" class="animate-spin" />
+      Logging In...
+    } @else {
+      Log In
     }
-    Log In
   </button>
 </form>

@@ -2,17 +2,18 @@ import { Component, signal, inject, ViewChildren } from '@angular/core';
 import type { OnInit, OnDestroy, QueryList, ElementRef } from '@angular/core';
 import { AuthModalService } from '../../../core/auth/auth-modal.service';
 import { SessionService } from '../../../core/auth/session.service';
+import { NotificationService } from '../../../core/notification/notification.service';
 import { environment } from '../../../../environment/environment';
-import { LucideLoaderCircle } from '@lucide/angular';
 
 @Component({
   selector: 'app-verify-email-view',
-  imports: [LucideLoaderCircle],
+  imports: [],
   templateUrl: './verify-email-view.html',
 })
 export class VerifyEmailView implements OnInit, OnDestroy {
   private readonly authModal = inject(AuthModalService);
   private readonly session = inject(SessionService);
+  private readonly notification = inject(NotificationService);
 
   @ViewChildren('otpInput') readonly otpInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
@@ -27,6 +28,16 @@ export class VerifyEmailView implements OnInit, OnDestroy {
   readonly canResend = signal(true);
   readonly cooldown = signal(0);
   private cooldownTimer: ReturnType<typeof setInterval> | null = null;
+
+  private setError(message: string): void {
+    this.error.set(message);
+    if (message) this.notification.error(message);
+  }
+
+  private setSuccess(message: string): void {
+    this.success.set(message);
+    if (message) this.notification.success(message);
+  }
 
   ngOnInit(): void {
     if (!environment.production) {
@@ -117,7 +128,7 @@ export class VerifyEmailView implements OnInit, OnDestroy {
     if (!this.formValid) return;
 
     this.loading.set(true);
-    this.error.set('');
+    this.setError('');
     this.errorType.set(null);
 
     try {
@@ -130,16 +141,16 @@ export class VerifyEmailView implements OnInit, OnDestroy {
       if (!response.ok) {
         const body = await response.json().catch(() => ({}));
         const parsed = this.parseError(body.message || 'Verification failed');
-        this.error.set(parsed.text);
+        this.setError(parsed.text);
         this.errorType.set(parsed.type);
         return;
       }
 
       this.session.updateUser({ emailVerified: true });
-      this.success.set('Email verified successfully!');
+      this.setSuccess('Email verified successfully!');
       setTimeout(() => this.authModal.close(), 1500);
     } catch {
-      this.error.set('Network error. Please try again.');
+      this.setError('Network error. Please try again.');
     } finally {
       this.loading.set(false);
     }
@@ -149,7 +160,7 @@ export class VerifyEmailView implements OnInit, OnDestroy {
     if (!this.canResend()) return;
 
     this.canResend.set(false);
-    this.error.set('');
+    this.setError('');
     this.errorType.set(null);
 
     try {
@@ -165,9 +176,9 @@ export class VerifyEmailView implements OnInit, OnDestroy {
       if (!response.ok) {
         const body = await response.json().catch(() => ({}));
         if (body.message?.includes('cooldown') || body.message?.includes('wait')) {
-          this.error.set(body.message);
+          this.setError(body.message);
         } else {
-          this.error.set(body.message || 'Failed to resend code');
+          this.setError(body.message || 'Failed to resend code');
         }
         this.startCooldown(5);
         return;
@@ -180,10 +191,10 @@ export class VerifyEmailView implements OnInit, OnDestroy {
         this.digits.set(filled);
       }
 
-      this.success.set('A new code has been sent to your email.');
+      this.setSuccess('A new code has been sent to your email.');
       this.startCooldown(60);
     } catch {
-      this.error.set('Network error. Please try again.');
+      this.setError('Network error. Please try again.');
       this.startCooldown(5);
     }
   }

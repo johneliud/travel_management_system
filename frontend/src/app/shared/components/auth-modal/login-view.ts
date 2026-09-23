@@ -2,17 +2,19 @@ import { Component, signal, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthModalService } from '../../../core/auth/auth-modal.service';
 import { AuthService } from '../../../core/auth/auth.service';
-import { LucideEye, LucideEyeOff, LucideLoaderCircle } from '@lucide/angular';
+import { NotificationService } from '../../../core/notification/notification.service';
+import { LucideEye, LucideEyeOff } from '@lucide/angular';
 
 @Component({
   selector: 'app-login-view',
-  imports: [LucideEye, LucideEyeOff, LucideLoaderCircle],
+  imports: [LucideEye, LucideEyeOff],
   templateUrl: './login-view.html',
 })
 export class LoginView {
   private readonly authModal = inject(AuthModalService);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly notification = inject(NotificationService);
 
   readonly email = signal('');
   readonly password = signal('');
@@ -20,6 +22,11 @@ export class LoginView {
   readonly loading = signal(false);
   readonly error = signal('');
   readonly touchedFields = signal<Set<string>>(new Set());
+
+  private setError(message: string): void {
+    this.error.set(message);
+    if (message) this.notification.error(message);
+  }
 
   markTouched(field: string): void {
     this.touchedFields.update((fields) => new Set(fields).add(field));
@@ -53,7 +60,7 @@ export class LoginView {
   }
 
   switchView(view: 'register' | 'forgot-password'): void {
-    this.error.set('');
+    this.setError('');
     this.authModal.switchView(view);
   }
 
@@ -65,7 +72,7 @@ export class LoginView {
     if (!this.formValid) return;
 
     this.loading.set(true);
-    this.error.set('');
+    this.setError('');
 
     try {
       await this.auth.login(this.email(), this.password());
@@ -76,7 +83,7 @@ export class LoginView {
         this.router.navigateByUrl(redirectUrl);
       }
     } catch (e) {
-      this.error.set(e instanceof Error ? e.message : 'Login failed');
+      this.setError(e instanceof Error ? e.message : 'Login failed');
     } finally {
       this.loading.set(false);
     }
