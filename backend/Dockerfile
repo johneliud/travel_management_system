@@ -30,4 +30,4 @@ EXPOSE 8080
 ENV SPRING_PROFILES_ACTIVE=docker \
     JAVA_OPTS="-XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
 
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+ENTRYPOINT ["sh", "-c", "case \"${DATABASE_URL:-}\" in postgresql://*|postgres://*) export DATABASE_URL=\"jdbc:$DATABASE_URL\";; esac; case \"${SPRING_DATASOURCE_URL:-}\" in postgresql://*|postgres://*) export SPRING_DATASOURCE_URL=\"jdbc:$SPRING_DATASOURCE_URL\";; esac; java $JAVA_OPTS -jar app.jar"]
