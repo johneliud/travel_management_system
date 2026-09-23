@@ -20,8 +20,9 @@ RUN addgroup -g 1001 -S appgroup && \
     adduser -u 1001 -S appuser -G appgroup
 
 COPY --from=builder /app/target/travel_management_system-0.0.1-SNAPSHOT.jar app.jar
+COPY entrypoint.sh ./entrypoint.sh
 
-RUN chown appuser:appgroup app.jar
+RUN chmod +x entrypoint.sh && chown appuser:appgroup app.jar entrypoint.sh
 
 USER appuser
 
@@ -30,4 +31,4 @@ EXPOSE 8080
 ENV SPRING_PROFILES_ACTIVE=docker \
     JAVA_OPTS="-XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
 
-ENTRYPOINT ["sh", "-c", "case \"${DATABASE_URL:-}\" in postgresql://*|postgres://*) export DATABASE_URL=\"jdbc:$DATABASE_URL\";; esac; case \"${SPRING_DATASOURCE_URL:-}\" in postgresql://*|postgres://*) export SPRING_DATASOURCE_URL=\"jdbc:$SPRING_DATASOURCE_URL\";; esac; java $JAVA_OPTS -jar app.jar"]
+ENTRYPOINT ["./entrypoint.sh"]
