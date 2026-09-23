@@ -1,10 +1,10 @@
 import { Component, signal, inject } from '@angular/core';
 import { AuthModalService } from '../../../core/auth/auth-modal.service';
-import { IconComponent } from '../icon/icon';
+import { LucideLoaderCircle } from '@lucide/angular';
 
 @Component({
   selector: 'app-forgot-password-view',
-  imports: [IconComponent],
+  imports: [LucideLoaderCircle],
   templateUrl: './forgot-password-view.html',
 })
 export class ForgotPasswordView {
@@ -33,11 +33,6 @@ export class ForgotPasswordView {
 
   get formValid(): boolean {
     return this.emailError === null && this.email().length > 0;
-  }
-
-  switchView(view: 'login'): void {
-    this.error.set('');
-    this.authModal.switchView(view);
   }
 
   async onSubmit(): Promise<void> {
