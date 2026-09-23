@@ -4,6 +4,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "Request body for user registration")
 public record RegisterRequest(
+	@Schema(description = "First name", example = "John", requiredMode = Schema.RequiredMode.REQUIRED)
+	@jakarta.validation.constraints.NotBlank(message = "is required")
+	@jakarta.validation.constraints.Size(min = 1, max = 100, message = "must be between 1 and 100 characters")
+	String firstName,
+
+	@Schema(description = "Last name", example = "Doe", requiredMode = Schema.RequiredMode.REQUIRED)
+	@jakarta.validation.constraints.NotBlank(message = "is required")
+	@jakarta.validation.constraints.Size(min = 1, max = 100, message = "must be between 1 and 100 characters")
+	String lastName,
+
 	@Schema(description = "User email address", example = "user@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
 	@jakarta.validation.constraints.Email(message = "must be a valid email address")
 	@jakarta.validation.constraints.NotBlank(message = "is required")
