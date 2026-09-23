@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
   selector: 'app-privacy',
   imports: [RouterLink],
   template: `
-    <article class="prose prose-(--color-text) max-w-none space-y-6">
+    <article class="prose px-4 sm:px-6 prose-(--color-text) max-w-none space-y-6">
       <h1>Privacy Policy</h1>
 
       <h2>1. Information We Collect</h2>

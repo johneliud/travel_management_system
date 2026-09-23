@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 @Component({
   selector: 'app-terms',
   template: `
-    <article class="prose prose-(--color-text) max-w-none space-y-6">
+    <article class="prose px-4 sm:px-6 prose-(--color-text) max-w-none space-y-6">
       <h1>Terms of Service</h1>
 
       <h2>1. Acceptance of Terms</h2>
