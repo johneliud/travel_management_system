@@ -54,7 +54,7 @@ import { RouterLink } from '@angular/router';
         <!-- Bottom bar -->
         <div class="mt-8 pt-6 border-t border-(--color-border) flex flex-col sm:flex-row items-center justify-between gap-4">
           <p class="text-xs text-(--color-text-muted)">
-            &copy; {{ currentYear }} Travel Management System. All rights reserved.
+            &copy; {{ currentYear }} Travel Management System
           </p>
         </div>
       </div>
