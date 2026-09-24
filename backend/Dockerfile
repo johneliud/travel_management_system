@@ -4,14 +4,12 @@ FROM maven:3.9-eclipse-temurin-21 AS builder
 WORKDIR /app
 
 COPY pom.xml .
-COPY .mvn .mvn
-COPY mvnw mvnw.cmd ./
 
-RUN chmod +x mvnw && ./mvnw dependency:go-offline -B
+RUN mvn dependency:go-offline -B
 
 COPY src ./src
 
-RUN ./mvnw clean package -DskipTests -B
+RUN mvn clean package -DskipTests -B
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine
@@ -22,8 +20,9 @@ RUN addgroup -g 1001 -S appgroup && \
     adduser -u 1001 -S appuser -G appgroup
 
 COPY --from=builder /app/target/travel_management_system-0.0.1-SNAPSHOT.jar app.jar
+COPY entrypoint.sh ./entrypoint.sh
 
-RUN chown appuser:appgroup app.jar
+RUN chmod +x entrypoint.sh && chown appuser:appgroup app.jar entrypoint.sh
 
 USER appuser
 
@@ -32,4 +31,4 @@ EXPOSE 8080
 ENV SPRING_PROFILES_ACTIVE=docker \
     JAVA_OPTS="-XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
 
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+ENTRYPOINT ["./entrypoint.sh"]

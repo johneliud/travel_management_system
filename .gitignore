@@ -35,6 +35,7 @@ build/
 ### Secrets ###
 **.properties
 !**application.properties
+!**/.mvn/wrapper/maven-wrapper.properties
 
 # Added by ggshield
 .cache_ggshield
